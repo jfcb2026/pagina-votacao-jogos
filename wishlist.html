@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishlist de Jogos Pagos — Página De Jogos De Amigos</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script>try{var t=JSON.parse(localStorage.getItem("jogosAmigos_tema"));if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<main>
+  <h1>Wishlist de Jogos Pagos (€)</h1>
+  <p class="subtitle">Jogos pagos que o grupo gostava de comprar. Cada membro reage com 👍 ou 👎 na sua própria coluna.</p>
+
+  <div class="card">
+    <p class="hint" id="import-hint" style="margin-top:0"></p>
+    <div class="table-scroll">
+      <table id="wishlist-table">
+        <thead><tr id="table-head"></tr></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="actions-row" style="margin-top:14px; margin-bottom:0">
+      <button class="primary" id="add-jogo-btn">+ Jogo</button>
+      <button id="import-btn">Importar de Excel</button>
+      <input type="file" id="import-input" accept=".xlsx,.xls,.csv" style="display:none">
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="assets/js/wishlist.js"></script>
+</body>
+</html>

@@ -1,0 +1,768 @@
+:root {
+  /* Midnight — tema padrão */
+  --bg: #0f1220;
+  --bg-alt: #171b2e;
+  --card: #1c2138;
+  --border: #2a3050;
+  --text: #e8e9f0;
+  --text-dim: #a7abc4;
+  --accent: #6c8cff;
+  --accent-dark: #4a63d6;
+  --good: #3ecf8e;
+  --bad: #f16565;
+  --warn: #f0b429;
+  --radius: 10px;
+}
+
+/* ---------- Temas de cores (Backoffice > Tema de Cores) ---------- */
+
+:root[data-theme="aurora"] {
+  --bg: #140f24;
+  --bg-alt: #1e1733;
+  --card: #251d3d;
+  --border: #382c56;
+  --text: #ece8f7;
+  --text-dim: #b0a7c9;
+  --accent: #a875ff;
+  --accent-dark: #8452e0;
+}
+
+:root[data-theme="ocean"] {
+  --bg: #0a1620;
+  --bg-alt: #102232;
+  --card: #132a3d;
+  --border: #1f3f57;
+  --text: #e3f1f7;
+  --text-dim: #93b6c7;
+  --accent: #33c4d6;
+  --accent-dark: #1f9baa;
+}
+
+:root[data-theme="sunset"] {
+  --bg: #1c1210;
+  --bg-alt: #2a1a17;
+  --card: #33211d;
+  --border: #4d322b;
+  --text: #f5e9e4;
+  --text-dim: #cbab9e;
+  --accent: #ff7a55;
+  --accent-dark: #e0562f;
+}
+
+:root[data-theme="forest"] {
+  --bg: #0e1712;
+  --bg-alt: #152219;
+  --card: #1a2a1f;
+  --border: #2a3f30;
+  --text: #e6f0e9;
+  --text-dim: #a3bfab;
+  --accent: #4fbf76;
+  --accent-dark: #379c5b;
+}
+
+:root[data-theme="rose"] {
+  --bg: #1a0f16;
+  --bg-alt: #271623;
+  --card: #2f1c2a;
+  --border: #472a3f;
+  --text: #f5e6f0;
+  --text-dim: #c79fb9;
+  --accent: #ff5fa2;
+  --accent-dark: #e0417f;
+}
+
+/* Temas vivos / alto contraste — fundo branco (como os campos de texto) e
+   cards num tom suave da mesma cor (como o --bg dos temas "claros"); só o
+   cabeçalho e outras superfícies com a cor forte (--bg-alt) usam texto
+   claro, através de --header-text/--header-text-dim (com fallback). */
+
+:root[data-theme="frost-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #264fe0;
+  --card: #eaf1ff;
+  --border: #a9c0f5;
+  --text: #10162b;
+  --text-dim: #3f4a70;
+  --accent: #264fe0;
+  --accent-dark: #15339e;
+  --good: #0e7a4c;
+  --bad: #c81f34;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #dbe6ff;
+  --tag-bg: #15339e;
+}
+
+:root[data-theme="citrus-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #e67700;
+  --card: #fff2d9;
+  --border: #f0c284;
+  --text: #231604;
+  --text-dim: #7a5a24;
+  --accent: #e67700;
+  --accent-dark: #b85e00;
+  --good: #0e7a4c;
+  --bad: #c81f34;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #ffe2bd;
+  --tag-bg: #b85e00;
+}
+
+:root[data-theme="berry-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #9c1ec2;
+  --card: #f6e4ff;
+  --border: #e0abf2;
+  --text: #1d0b28;
+  --text-dim: #5a3f70;
+  --accent: #9c1ec2;
+  --accent-dark: #7a1798;
+  --good: #0e7a4c;
+  --bad: #c81f34;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #f0d4fb;
+  --tag-bg: #7a1798;
+}
+
+:root[data-theme="mint-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #00994f;
+  --card: #e2f7ea;
+  --border: #8bdcae;
+  --text: #0a2417;
+  --text-dim: #356048;
+  --accent: #00994f;
+  --accent-dark: #006b38;
+  --good: #0e7a4c;
+  --bad: #c81f34;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #c9f2dc;
+  --tag-bg: #006b38;
+}
+
+:root[data-theme="coral-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #e8341f;
+  --card: #ffe4e0;
+  --border: #f4a99f;
+  --text: #2b0f0c;
+  --text-dim: #6a463f;
+  --accent: #e8341f;
+  --accent-dark: #b8231a;
+  --good: #0e7a4c;
+  --bad: #a8180f;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #ffd6cf;
+  --tag-bg: #b8231a;
+}
+
+:root[data-theme="graphite-vivo"] {
+  --bg: #ffffff;
+  --bg-alt: #4a1adb;
+  --card: #ece4fb;
+  --border: #c1abf0;
+  --text: #0b0b0f;
+  --text-dim: #45454f;
+  --accent: #4a1adb;
+  --accent-dark: #320fa0;
+  --good: #0e7a4c;
+  --bad: #c81f34;
+  --warn: #a3690a;
+  --header-text: #ffffff;
+  --header-text-dim: #dcd0fb;
+  --tag-bg: #320fa0;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 60px;
+}
+
+a { color: var(--accent); }
+
+header.site-header {
+  background: var(--bg-alt);
+  color: var(--header-text, var(--text));
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.site-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--header-text, var(--text));
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.member-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--header-text-dim, var(--text-dim));
+}
+
+.member-picker select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+nav.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 12px 10px;
+}
+
+nav.main-nav a {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--header-text-dim, var(--text-dim));
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+nav.main-nav a:hover { background: rgba(0, 0, 0, 0.08); color: var(--header-text, var(--text)); }
+nav.main-nav a.active { background: var(--accent); color: #fff; }
+
+/* Menu hamburger: só aparece em ecrãs pequenos (ver media query mais
+   abaixo); em ecrãs largos o menu principal mantém-se sempre visível. */
+.menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--header-text, var(--text));
+}
+.menu-toggle:hover { border-color: var(--accent); }
+
+main {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 4px; }
+h2 { font-size: 1.15rem; margin: 28px 0 10px; }
+p.subtitle { color: var(--text-dim); margin-top: 0; }
+
+.card {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+button, .btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--header-text, var(--text));
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+button:hover { border-color: var(--accent); }
+
+button:disabled, .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+button:disabled:hover { border-color: var(--border); }
+
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover { background: var(--accent-dark); }
+
+/* Votação Semanal: botão Validar Votos em tom esverdeado; o mesmo tom é
+   usado nos botões de adicionar (Jogo / Evento) */
+#validar-btn.primary,
+#add-jogo-btn.primary,
+#add-evento-btn.primary,
+#add-member-btn.primary,
+#add-type-btn.primary,
+#add-col-habituais-btn.primary,
+#add-col-nao-jogados-btn.primary,
+#add-col-wishlist-btn.primary,
+#add-col-eventos-btn.primary {
+  background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)), var(--good);
+  border-color: var(--good);
+}
+#validar-btn.primary:hover,
+#add-jogo-btn.primary:hover,
+#add-evento-btn.primary:hover,
+#add-member-btn.primary:hover,
+#add-type-btn.primary:hover,
+#add-col-habituais-btn.primary:hover,
+#add-col-nao-jogados-btn.primary:hover,
+#add-col-wishlist-btn.primary:hover,
+#add-col-eventos-btn.primary:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.34)), var(--good);
+}
+
+/* Botões "perigosos" (esvaziar/limpar/remover/reiniciar) preenchidos a
+   vermelho, com texto e ícone brancos, em todas as páginas do site */
+button.danger {
+  background: var(--bad);
+  border-color: var(--bad);
+  color: #fff;
+}
+button.danger:hover { filter: brightness(0.9); border-color: var(--bad); }
+
+/* Botão "Migrar p/ Habituais" preenchido com a cor de destaque do tema,
+   para se distinguir do Remover em todas as tabelas onde aparece */
+button.migrate-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+button.migrate-btn:hover { filter: brightness(0.9); border-color: var(--accent); }
+
+/* Backoffice: o botão de limpar reações fica a laranja */
+#clear-reactions-btn {
+  background: var(--warn);
+  border-color: var(--warn);
+  color: #fff;
+}
+#clear-reactions-btn:hover { filter: brightness(0.9); }
+
+button.small, .btn.small { padding: 4px 9px; font-size: 0.78rem; }
+
+.btn-icon { vertical-align: -2px; margin-left: 5px; }
+.nav-icon { vertical-align: -2px; margin-right: 6px; }
+
+/* Wishlist: cabeçalhos centrados, exceto Jogo e Link */
+.text-center { text-align: center; }
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 0.88rem;
+}
+
+thead th {
+  background: var(--bg-alt);
+  color: var(--header-text, var(--text));
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+/* Redimensionar colunas: pega invisível no limite direito de cada
+   cabeçalho, com uma linha fina a marcar o limite ao passar o rato /
+   durante o arrasto */
+.col-resizer {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 5;
+  touch-action: none;
+}
+.col-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2px;
+  width: 2px;
+  background: transparent;
+}
+.col-resizer:hover::after, .col-resizer.resizing::after { background: var(--accent); }
+
+tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+table input[type="text"], table input[type="date"], table select, table textarea {
+  width: 100%;
+  min-width: 90px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.col-actions { white-space: nowrap; text-align: right; }
+
+/* Jogos Habituais, Jogos ainda não jogados e Wishlist: colunas
+   configuráveis no Backoffice (Colunas das Tabelas de Jogos) e com largura
+   ajustável arrastando o limite direito de cada cabeçalho (ver .col-resizer
+   e initColumnResize em common.js); as larguras iniciais e o layout de cada
+   coluna são definidos em JS, ao construir o colgroup de cada tabela. */
+#habituais-table, #nao-jogados-table, #wishlist-table {
+  table-layout: fixed;
+  min-width: 0;
+}
+#habituais-table { width: auto; }
+#nao-jogados-table, #wishlist-table { width: 100%; }
+
+/* Votação Semanal: a tabela deixa de esticar para preencher o cartão, e as
+   colunas ficam do tamanho das dropdowns (sem sobra de espaço à volta) */
+/* A tabela nunca fica mais estreita do que com 2 jogos por membro, mesmo
+   que os slots sejam reduzidos para 1; com 3+ jogos cresce normalmente. */
+#votacao-table { width: auto; min-width: 600px; }
+#votacao-table select { width: 216px; min-width: 0; display: block; margin: 0 auto; }
+.table-scroll-fit { width: fit-content; max-width: 100%; margin: 0 auto; }
+
+.votacao-wrap { width: fit-content; max-width: 100%; margin: 0 auto; }
+.votacao-wrap .table-scroll { width: fit-content; max-width: 100%; }
+.votacao-wrap .actions-row { width: 100%; justify-content: center; }
+
+.card-half { width: 75%; margin-left: auto; margin-right: auto; }
+@media (max-width: 900px) {
+  .card-half { width: 100%; }
+}
+
+/* Card da tabela de votação: a largura acompanha o conteúdo (nº de colunas
+   de jogo), mantendo sempre a mesma margem entre a tabela e o card */
+.card-fit { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+
+/* Votação Semanal: os cards de Resultados e Histórico acompanham sempre a
+   largura exata do card da tabela (definida via JS em votacao.js), nunca o
+   contrário — encolhem tanto quanto a tabela encolher. */
+.card-sync { margin-left: auto; margin-right: auto; max-width: 100%; }
+
+#votacao-table thead th { text-align: center; }
+
+#dia-jogo-label { color: var(--text-dim); }
+
+.results-list li.placeholder { justify-content: center; text-align: center; }
+
+.winner-box { text-align: center; }
+
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: var(--tag-bg, var(--bg-alt));
+  color: var(--header-text, var(--text));
+  border: 1px solid var(--border);
+}
+
+/* Backoffice: placeholder "N jogos por membro" com a mesma altura dos
+   botões +/- ao lado; fica acompanhado de botões, por isso mantém o tom
+   normal (--bg-alt) em vez do tom mais escuro das tags isoladas */
+#slot-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+  background: var(--bg-alt);
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.results-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--tag-bg, var(--bg-alt));
+  color: var(--header-text, var(--text));
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  min-width: 45.5%;
+  width: auto;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.results-list li:first-child { border-color: var(--accent); }
+
+.winner-box {
+  margin: 14px auto 0;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(62, 207, 142, 0.12);
+  border: 1px solid var(--good);
+  font-weight: 600;
+  font-size: 1.15rem;
+  width: 45.5%;
+}
+
+.winner-box.tie {
+  background: rgba(240, 180, 41, 0.12);
+  border-color: var(--warn);
+}
+
+.winner-name { display: inline-block; margin-top: 4px; font-size: 1.3rem; }
+
+#historico-list li { justify-content: flex-start; gap: 8px; min-width: 78.08%; width: auto; max-width: 100%; white-space: nowrap; }
+#historico-list li.placeholder { justify-content: center; text-align: center; }
+.historico-jogo { font-size: 1.05rem; font-weight: 600; }
+.historico-data { font-size: 1.05rem; }
+
+@media (max-width: 640px) {
+  .results-list li, .winner-box { width: 100%; }
+  #historico-list li { min-width: 100%; white-space: normal; }
+}
+
+.reaction-btns { display: flex; gap: 4px; align-items: center; }
+
+.reaction-btns button.like.active { background: var(--good); border-color: var(--good); color: #08221a; }
+.reaction-btns button.dislike.active { background: var(--bad); border-color: var(--bad); color: #2a0808; }
+
+.member-response-btns { display: flex; gap: 4px; justify-content: center; }
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-btn.adere { color: var(--good); border-color: var(--good); }
+.icon-btn.nao-adere { color: var(--bad); border-color: var(--bad); }
+.member-response-btns button.adere.active { background: var(--good); border-color: var(--good); color: #08221a; }
+.member-response-btns button.nao-adere.active { background: var(--bad); border-color: var(--bad); color: #2a0808; }
+
+/* Eventos: colunas configuráveis no Backoffice, tal como as tabelas de
+   jogos, com a mesma largura ajustável a arrastar (ver .col-resizer) */
+#eventos-table { table-layout: fixed; width: 100%; min-width: 0; }
+
+/* Eventos: input da Data ocupa só uma parte da coluna */
+#eventos-table input[type="date"] { width: 60%; min-width: 130px; }
+
+/* Eventos: coluna Total Aderentes sem quebra */
+#eventos-table td.text-center { white-space: nowrap; }
+
+.login-wrap {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.login-card {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 14px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.login-error { color: var(--bad); font-size: 0.85rem; min-height: 1.2em; }
+
+.backoffice-section {
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.backoffice-section:last-child { border-bottom: none; }
+
+.hint { color: var(--text-dim); font-size: 0.8rem; margin-top: 6px; }
+
+.type-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.type-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--tag-bg, var(--bg-alt));
+  color: var(--header-text, var(--text));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 6px 5px 12px;
+  font-size: 0.85rem;
+}
+.type-chip button { padding: 2px 7px; font-size: 0.75rem; }
+
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.inline-form input[type="text"] {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+/* Backoffice: seletor de tema de cores */
+.column-editor { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; }
+.column-row { display: flex; align-items: center; gap: 6px; }
+.column-row .col-label-input {
+  flex: 0 1 25%;
+  min-width: 140px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+.column-row button.small { flex-shrink: 0; }
+
+.theme-group { margin-bottom: 16px; }
+.theme-group:last-child { margin-bottom: 0; }
+
+.theme-group-title {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0 0 4px;
+}
+
+.theme-swatch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: var(--header-text, var(--text));
+  text-align: left;
+}
+
+.theme-swatch:hover { border-color: var(--accent); }
+
+.theme-swatch.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.theme-swatch-dots {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.theme-swatch-dots span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-left: -6px;
+}
+.theme-swatch-dots span:first-child { margin-left: 0; }
+
+.theme-swatch-label { display: flex; flex-direction: column; gap: 1px; }
+.theme-swatch-tag { font-size: 0.72rem; color: var(--header-text-dim, var(--text-dim)); }
+
+/* Menu principal: em ecrãs pequenos fica colapsado atrás do botão
+   hamburger, em vez de aparecer sempre como uma barra de links */
+@media (max-width: 700px) {
+  .menu-toggle { display: inline-flex; }
+  .header-top { flex-wrap: nowrap; }
+  .site-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 1rem; }
+  .member-picker { flex-shrink: 0; }
+
+  nav.main-nav {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px 12px 12px;
+  }
+  nav.main-nav.open { display: flex; }
+  nav.main-nav a { padding: 10px 12px; }
+}
+
+@media (max-width: 640px) {
+  main { padding: 14px 10px 30px; }
+}
+
+@media (max-width: 480px) {
+  .theme-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+}

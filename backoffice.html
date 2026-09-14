@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backoffice — Página De Jogos De Amigos</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<script>try{var t=JSON.parse(localStorage.getItem("jogosAmigos_tema"));if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+</head>
+<body>
+<main>
+  <h1>Backoffice</h1>
+  <p class="subtitle">Gestão do site. Esta página não aparece no menu principal.</p>
+
+  <div class="card">
+    <div class="backoffice-section">
+      <h2 style="margin-top:0">Nome do Site</h2>
+      <p class="hint">Nome apresentado no topo de todas as páginas e no ecrã de acesso.</p>
+      <div class="inline-form">
+        <input type="text" id="site-name-input" placeholder="Nome do site">
+        <button class="primary" id="save-site-name-btn">Guardar</button>
+      </div>
+      <p class="hint" id="site-name-msg"></p>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Membros</h2>
+      <p class="hint">Pessoas do grupo. Aparecem em toda a aplicação (votação, eventos, wishlist).</p>
+      <div id="member-list" class="type-list"></div>
+      <div class="inline-form">
+        <input type="text" id="new-member" placeholder="Nome do novo membro">
+        <button class="primary" id="add-member-btn">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Votação Semanal — Dia de Jogo</h2>
+      <p class="hint">Dia da semana em que o grupo costuma jogar. Aparece na Votação Semanal a data do próximo dia com essa data.</p>
+      <div class="inline-form">
+        <select id="dia-jogo-select"></select>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Votação Semanal — Slots de Jogo</h2>
+      <p class="hint">Número de jogos que cada membro pode votar por semana (colunas "Jogo 1", "Jogo 2", ...).</p>
+      <div class="inline-form">
+        <button id="remove-slot-btn">−</button>
+        <span class="pill" id="slot-count"></span>
+        <button id="add-slot-btn">+</button>
+      </div>
+      <p class="hint" id="slot-msg"></p>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Histórico de Jogos Vencedores</h2>
+      <p class="hint">Apaga o histórico de jogos vencedores e reinicia a votação atual (votos e validação).</p>
+      <div class="actions-row">
+        <button class="danger" id="clear-historico-btn">Limpar histórico de vencedores</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Tipos de Evento</h2>
+      <p class="hint">Categorias disponíveis na dropdown "Tipo" ao criar um evento (Escape Room, Passeio, ...).</p>
+      <div class="type-list" id="type-list"></div>
+      <div class="inline-form">
+        <input type="text" id="new-type" placeholder="Novo tipo de evento">
+        <button class="primary" id="add-type-btn">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Wishlist</h2>
+      <p class="hint">Reinicia as reações (👍/👎) de todos os membros, ou esvazia por completo a lista de jogos pagos.</p>
+      <div class="actions-row">
+        <button id="clear-reactions-btn">Limpar reações (Likes/Dislikes)</button>
+        <button class="danger" id="empty-wishlist-btn">Esvaziar lista da Wishlist</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Esvaziar Listas de Jogos</h2>
+      <p class="hint">Remove todos os jogos das listas de Jogos Habituais e Jogos ainda não jogados.</p>
+      <div class="actions-row">
+        <button class="danger" id="empty-habituais-btn">Esvaziar Jogos Habituais</button>
+        <button class="danger" id="empty-nao-jogados-btn">Esvaziar Jogos ainda não jogados</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Colunas das Tabelas de Jogos</h2>
+      <p class="hint">Adiciona, remove, renomeia ou reordena as colunas das tabelas de Jogos Habituais, Jogos ainda não jogados, Wishlist e Eventos. A primeira coluna de cada tabela não pode ser removida.</p>
+
+      <h3 class="theme-group-title">Jogos Habituais</h3>
+      <div id="cols-habituais" class="column-editor"></div>
+      <div class="inline-form">
+        <input type="text" id="new-col-habituais" placeholder="Nome da nova coluna">
+        <button class="primary" id="add-col-habituais-btn">Adicionar</button>
+      </div>
+
+      <h3 class="theme-group-title" style="margin-top:18px">Jogos ainda não jogados</h3>
+      <div id="cols-nao-jogados" class="column-editor"></div>
+      <div class="inline-form">
+        <input type="text" id="new-col-nao-jogados" placeholder="Nome da nova coluna">
+        <button class="primary" id="add-col-nao-jogados-btn">Adicionar</button>
+      </div>
+
+      <h3 class="theme-group-title" style="margin-top:18px">Wishlist de Jogos Pagos</h3>
+      <div id="cols-wishlist" class="column-editor"></div>
+      <div class="inline-form">
+        <input type="text" id="new-col-wishlist" placeholder="Nome da nova coluna">
+        <button class="primary" id="add-col-wishlist-btn">Adicionar</button>
+      </div>
+
+      <h3 class="theme-group-title" style="margin-top:18px">Eventos</h3>
+      <div id="cols-eventos" class="column-editor"></div>
+      <div class="inline-form">
+        <input type="text" id="new-col-eventos" placeholder="Nome da nova coluna">
+        <button class="primary" id="add-col-eventos-btn">Adicionar</button>
+      </div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Tema de Cores</h2>
+      <p class="hint">Escolhe o esquema de cores do site. Fica guardado neste dispositivo e aplica-se a todas as páginas.</p>
+      <div id="theme-groups"></div>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Password de Acesso</h2>
+      <p class="hint">Password partilhada usada para entrar no site.</p>
+      <div class="inline-form">
+        <input type="password" id="new-password" placeholder="Nova password">
+        <button class="primary" id="save-password-btn">Guardar nova password</button>
+      </div>
+      <p class="hint" id="password-msg"></p>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Sincronização entre Membros (nuvem)</h2>
+      <p class="hint">Quando ligado, os dados (jogos, membros, votação, eventos, etc.) passam a atualizar-se automaticamente para todos os membros, sem precisar de export/import manual. Usa este botão uma única vez, depois de configurada a sincronização, para enviar os dados já existentes neste browser para a nuvem.</p>
+      <div class="actions-row">
+        <button class="primary" id="sync-push-btn">Enviar dados deste browser para a nuvem</button>
+      </div>
+      <p class="hint" id="sync-msg"></p>
+    </div>
+
+    <div class="backoffice-section">
+      <h2>Exportar dados</h2>
+      <p class="hint">Descarrega o estado atual de cada lista como ficheiro JSON, para colocar em assets/data/ e enviar (commit) para o repositório.</p>
+      <div class="actions-row">
+        <button id="export-all-btn">Exportar tudo</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/backoffice.js"></script>
+</body>
+</html>

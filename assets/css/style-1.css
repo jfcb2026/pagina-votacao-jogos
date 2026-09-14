@@ -1,0 +1,350 @@
+:root {
+  --bg: #0f1220;
+  --bg-alt: #171b2e;
+  --card: #1c2138;
+  --border: #2a3050;
+  --text: #e8e9f0;
+  --text-dim: #a7abc4;
+  --accent: #6c8cff;
+  --accent-dark: #4a63d6;
+  --good: #3ecf8e;
+  --bad: #f16565;
+  --warn: #f0b429;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 60px;
+}
+
+a { color: var(--accent); }
+
+header.site-header {
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.site-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.member-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.member-picker select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+nav.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 12px 10px;
+}
+
+nav.main-nav a {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+nav.main-nav a:hover { background: var(--card); color: var(--text); }
+nav.main-nav a.active { background: var(--accent); color: #fff; }
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 4px; }
+h2 { font-size: 1.15rem; margin: 28px 0 10px; }
+p.subtitle { color: var(--text-dim); margin-top: 0; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+button, .btn {
+  font-family: inherit;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--accent); }
+
+button:disabled, .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+button:disabled:hover { border-color: var(--border); }
+
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover { background: var(--accent-dark); }
+
+button.danger { color: var(--bad); }
+button.danger:hover { border-color: var(--bad); }
+
+button.small { padding: 4px 9px; font-size: 0.78rem; }
+
+.table-scroll {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 0.88rem;
+}
+
+thead th {
+  background: var(--bg-alt);
+  text-align: left;
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+}
+
+tbody td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+table input[type="text"], table input[type="date"], table select {
+  width: 100%;
+  min-width: 90px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+}
+
+.col-actions { white-space: nowrap; text-align: right; }
+
+/* Votação Semanal: a tabela deixa de esticar para preencher o cartão, e as
+   colunas ficam do tamanho das dropdowns (sem sobra de espaço à volta) */
+/* A tabela nunca fica mais estreita do que com 2 jogos por membro, mesmo
+   que os slots sejam reduzidos para 1; com 3+ jogos cresce normalmente. */
+#votacao-table { width: auto; min-width: 600px; }
+#votacao-table select { width: 216px; min-width: 0; display: block; margin: 0 auto; }
+.table-scroll-fit { width: fit-content; max-width: 100%; margin: 0 auto; }
+
+.votacao-wrap { width: fit-content; max-width: 100%; margin: 0 auto; }
+.votacao-wrap .table-scroll { width: fit-content; max-width: 100%; }
+.votacao-wrap .actions-row { width: fit-content; }
+
+.card-half { width: 75%; margin-left: auto; margin-right: auto; }
+@media (max-width: 900px) {
+  .card-half { width: 100%; }
+}
+
+/* Card da tabela de votação: a largura acompanha o conteúdo (nº de colunas
+   de jogo), mantendo sempre a mesma margem entre a tabela e o card */
+.card-fit { width: fit-content; max-width: 100%; margin-left: auto; margin-right: auto; }
+
+/* Votação Semanal: os cards de Resultados e Histórico acompanham sempre a
+   largura exata do card da tabela (definida via JS em votacao.js), nunca o
+   contrário — encolhem tanto quanto a tabela encolher. */
+.card-sync { margin-left: auto; margin-right: auto; max-width: 100%; }
+
+#votacao-table thead th { text-align: center; }
+
+#dia-jogo-label { color: #d6d8e6; }
+
+.results-list li.placeholder { justify-content: center; text-align: center; }
+
+.winner-box { text-align: center; }
+
+.pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+}
+
+.results-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.results-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-alt);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  width: 45.5%;
+}
+
+.results-list li:first-child { border-color: var(--accent); }
+
+.winner-box {
+  margin: 14px auto 0;
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(62, 207, 142, 0.12);
+  border: 1px solid var(--good);
+  font-weight: 600;
+  font-size: 1.15rem;
+  width: 45.5%;
+}
+
+.winner-box.tie {
+  background: rgba(240, 180, 41, 0.12);
+  border-color: var(--warn);
+}
+
+.winner-name { display: inline-block; margin-top: 4px; font-size: 1.3rem; }
+
+#historico-list li { justify-content: flex-start; gap: 8px; width: 78.08%; }
+.historico-jogo { font-size: 1.05rem; font-weight: 600; }
+.historico-data { color: var(--text-dim); font-size: 1.05rem; }
+
+@media (max-width: 640px) {
+  .results-list li, .winner-box { width: 100%; }
+}
+
+.reaction-btns { display: flex; gap: 4px; align-items: center; }
+
+.reaction-btns button.like.active { background: var(--good); border-color: var(--good); color: #08221a; }
+.reaction-btns button.dislike.active { background: var(--bad); border-color: var(--bad); color: #2a0808; }
+
+.member-response-btns { display: flex; gap: 4px; }
+.member-response-btns button.adere.active { background: var(--good); border-color: var(--good); color: #08221a; }
+.member-response-btns button.nao-adere.active { background: var(--bad); border-color: var(--bad); color: #2a0808; }
+
+.login-wrap {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin: 14px 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.login-error { color: var(--bad); font-size: 0.85rem; min-height: 1.2em; }
+
+.backoffice-section {
+  margin-bottom: 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.backoffice-section:last-child { border-bottom: none; }
+
+.hint { color: var(--text-dim); font-size: 0.8rem; margin-top: 6px; }
+
+.type-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.type-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 6px 5px 12px;
+  font-size: 0.85rem;
+}
+.type-chip button { padding: 2px 7px; font-size: 0.75rem; }
+
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.inline-form input[type="text"] {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+
+@media (max-width: 640px) {
+  .header-top { flex-direction: column; align-items: flex-start; }
+  main { padding: 14px 10px 30px; }
+}
