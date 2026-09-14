@@ -137,6 +137,7 @@ document.getElementById("validar-btn").addEventListener("click", () => {
     document.getElementById("validar-erro").textContent = "Não há nenhum voto para validar.";
     return;
   }
+  if (!confirm("Validar os votos? A tabela deixa de poder ser editada até reiniciares a votação.")) return;
   votacao.validado = true;
   persist();
 
