@@ -14,6 +14,7 @@ document.getElementById("empty-habituais-btn").innerHTML = `Esvaziar Jogos Habit
 document.getElementById("empty-nao-jogados-btn").innerHTML = `Esvaziar Jogos ainda não jogados${TRASH_ICON}`;
 document.getElementById("save-password-btn").innerHTML = `Guardar nova password${SAVE_ICON}`;
 document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
+document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
 
 /* ---- Sincronização com a nuvem ---- */
 document.getElementById("sync-push-btn").addEventListener("click", () => {

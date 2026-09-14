@@ -433,6 +433,8 @@ const SAVE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" widt
 
 const MIGRATE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
 
+const CLOUD_UPLOAD_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path><polyline points="12 12 12 21"></polyline><polyline points="9 15 12 12 15 15"></polyline></svg>';
+
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, s => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
