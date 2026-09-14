@@ -77,6 +77,7 @@ const DEFAULT_DATA = {
     { id: "data", label: "Data", type: "date" },
   ],
   tiposEvento: ["Escape Room", "Passeio", "Almoço", "Jantar"],
+  passwordOverride: null,
   votacaoSemanal: { slots: 2, votos: {}, validado: false },
   historicoVencedores: [],
   diaSemanaJogo: 4, // 0 = Domingo ... 4 = Quinta-Feira
@@ -186,7 +187,7 @@ const CLOUD_SYNC_KEYS = [
   "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos",
   "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos",
   "tiposEvento", "votacaoSemanal", "historicoVencedores", "diaSemanaJogo",
-  "nomeSite",
+  "nomeSite", "passwordOverride",
 ];
 
 let _cloudReady = false;
@@ -255,17 +256,18 @@ initCloudSync();
 
 /* ---------- Autenticação (password partilhada) ---------- */
 /* A password por defeito vem de auth.js (fora do repositório público).
-   O Backoffice permite mudar a password guardando uma versão nova no
-   localStorage, que passa a ter prioridade sobre a de auth.js. */
+   O Backoffice permite mudar a password, guardando uma versão nova
+   (agora sincronizada via Firebase, como as restantes listas) que passa
+   a ter prioridade sobre a de auth.js para todos os membros. */
 
 function getActivePassword() {
-  const override = localStorage.getItem(storageKey("passwordOverride"));
-  if (override !== null) return override;
+  const override = loadStore("passwordOverride");
+  if (override) return override;
   return (typeof SITE_PASSWORD !== "undefined") ? SITE_PASSWORD : "alterar123";
 }
 
 function setActivePassword(newPassword) {
-  localStorage.setItem(storageKey("passwordOverride"), newPassword);
+  saveStore("passwordOverride", newPassword);
 }
 
 function isAuthenticated() {
