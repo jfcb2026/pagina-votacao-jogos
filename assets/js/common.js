@@ -224,13 +224,23 @@ function watchCloudKey(name) {
 }
 
 function initCloudSync() {
-  if (typeof firebase === "undefined") return;
-  firebase.auth().onAuthStateChanged(user => {
-    if (!user) return;
-    _cloudReady = true;
-    CLOUD_SYNC_KEYS.forEach(watchCloudKey);
-  });
-  firebase.auth().signInAnonymously().catch(() => { /* sem sincronização, fica só local */ });
+  /* Se o Firebase não estiver disponível (SDK não carregado) ou não tiver
+     sido inicializado (falta assets/js/firebase-config.js, por exemplo
+     numa cópia do site sem esse ficheiro, que fica fora do repositório
+     por conter a configuração do projeto), o site tem de continuar a
+     funcionar normalmente em modo só-local, exatamente como antes desta
+     funcionalidade existir — daí o try/catch: um erro aqui nunca pode
+     impedir o resto deste ficheiro (cabeçalho, tabelas, etc.) de correr. */
+  try {
+    if (typeof firebase === "undefined") return;
+    if (!firebase.apps || !firebase.apps.length) return; // sem firebase-config.js, nenhuma app inicializada
+    firebase.auth().onAuthStateChanged(user => {
+      if (!user) return;
+      _cloudReady = true;
+      CLOUD_SYNC_KEYS.forEach(watchCloudKey);
+    });
+    firebase.auth().signInAnonymously().catch(() => { /* sem sincronização, fica só local */ });
+  } catch (e) { /* sem sincronização, fica só local */ }
 }
 
 /* Envia para o Firestore o valor atual (guardado localmente) de todas as
