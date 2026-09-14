@@ -568,7 +568,7 @@ table input[type="text"], table input[type="date"], table select, table textarea
 .historico-data { font-size: 1.05rem; }
 
 @media (max-width: 640px) {
-  .results-list li, .winner-box { width: 100%; }
+  .results-list li, .winner-box { width: 100%; white-space: normal; }
   #historico-list li { min-width: 100%; white-space: normal; }
 }
 
