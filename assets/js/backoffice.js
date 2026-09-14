@@ -2,7 +2,6 @@ initPage("backoffice.html");
 
 document.getElementById("export-all-btn").innerHTML = `Exportar tudo${EXPORT_ICON}`;
 document.getElementById("add-member-btn").innerHTML = `Adicionar${PLUS_ICON}`;
-document.getElementById("add-type-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-habituais-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-nao-jogados-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-wishlist-btn").innerHTML = `Adicionar${PLUS_ICON}`;
@@ -207,35 +206,6 @@ document.getElementById("clear-historico-btn").addEventListener("click", () => {
   alert("Histórico de vencedores e votação atual limpos.");
 });
 
-/* ---- Tipos de passeio ---- */
-let tipos = loadStore("tiposEvento");
-
-function renderTypes() {
-  const list = document.getElementById("type-list");
-  list.innerHTML = tipos.map((t, i) => `
-    <span class="type-chip">${escapeHtml(t)} <button class="remove-type-btn" data-idx="${i}">x</button></span>
-  `).join("");
-  list.querySelectorAll(".remove-type-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      tipos.splice(Number(btn.dataset.idx), 1);
-      saveStore("tiposEvento", tipos);
-      renderTypes();
-    });
-  });
-}
-
-document.getElementById("add-type-btn").addEventListener("click", () => {
-  const input = document.getElementById("new-type");
-  const val = input.value.trim();
-  if (!val) return;
-  tipos.push(val);
-  saveStore("tiposEvento", tipos);
-  input.value = "";
-  renderTypes();
-});
-
-renderTypes();
-
 /* ---- Wishlist ---- */
 document.getElementById("clear-reactions-btn").addEventListener("click", () => {
   if (!confirm("Limpar todas as reações (Likes/Dislikes) da Wishlist?")) return;
@@ -349,7 +319,6 @@ document.getElementById("export-all-btn").addEventListener("click", () => {
   downloadJson("jogos-nao-jogados.json", loadStore("jogosNaoJogados"));
   downloadJson("wishlist.json", loadStore("wishlist"));
   downloadJson("passeios.json", loadStore("eventos"));
-  downloadJson("tipos-passeio.json", loadStore("tiposEvento"));
   downloadJson("votacao.json", loadStore("votacaoSemanal"));
   downloadJson("historico-vencedores.json", loadStore("historicoVencedores"));
   downloadJson("dia-semana-jogo.json", loadStore("diaSemanaJogo"));

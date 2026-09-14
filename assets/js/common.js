@@ -7,7 +7,7 @@ const NAV_ICON_VOTACAO = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/sv
 const NAV_ICON_HABITUAIS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>';
 const NAV_ICON_NAO_JOGADOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
 const NAV_ICON_WISHLIST = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7.5c-1.2-1.5-3-2.5-5-2.5-3.6 0-6.5 3.1-6.5 7s2.9 7 6.5 7c2 0 3.8-1 5-2.5"></path><line x1="3" y1="10" x2="13" y2="10"></line><line x1="3" y1="14" x2="12" y2="14"></line></svg>';
-const NAV_ICON_EVENTOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+const NAV_ICON_EVENTOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"></path><rect x="3" y="11" width="18" height="6" rx="2"></rect><circle cx="7.5" cy="17.5" r="1.5"></circle><circle cx="16.5" cy="17.5" r="1.5"></circle></svg>';
 
 const NAV_ITEMS = [
   { href: "votacao-semanal.html", label: "Votação Semanal", icon: NAV_ICON_VOTACAO },
@@ -72,10 +72,8 @@ const DEFAULT_DATA = {
     { id: "link", label: "Link" },
   ],
   colunasEventos: [
-    { id: "tipo", label: "Tipo", core: true, type: "select" },
-    { id: "descricao", label: "Descrição", type: "textarea" },
+    { id: "descricao", label: "Descrição", core: true },
   ],
-  tiposEvento: ["Escape Room", "Passeio", "Almoço", "Jantar"],
   passwordOverride: null,
   votacaoSemanal: { slots: 2, votos: {}, validado: false },
   historicoVencedores: [],
@@ -185,7 +183,7 @@ function emptyStore(name, emptyValue) {
 const CLOUD_SYNC_KEYS = [
   "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos",
   "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos",
-  "tiposEvento", "votacaoSemanal", "historicoVencedores", "diaSemanaJogo",
+  "votacaoSemanal", "historicoVencedores", "diaSemanaJogo",
   "nomeSite", "passwordOverride",
 ];
 

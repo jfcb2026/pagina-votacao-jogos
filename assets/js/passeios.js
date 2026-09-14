@@ -2,23 +2,36 @@ initPage("passeios.html");
 
 let eventos = loadStore("eventos");
 let membros = loadStore("membros");
-let tipos = loadStore("tiposEvento");
 let colunas = loadStore("colunasEventos");
 
 function persist() { saveStore("eventos", eventos); }
 
-function tipoOptionsHtml(selected) {
-  let html = `<option value="">—</option>`;
-  tipos.forEach(t => {
-    const sel = t === selected ? "selected" : "";
-    html += `<option value="${escapeHtml(t)}" ${sel}>${escapeHtml(t)}</option>`;
-  });
-  return html;
-}
+/* Migração: browsers que já tinham a tabela antiga (com colunas "Tipo" e
+   "Data", entretanto descontinuadas, e "Descrição" como textarea) ficam só
+   com "Descrição" como campo de texto simples. Corre uma vez por browser
+   e sincroniza a limpeza para todos via saveStore. */
+(function migrarColunasAntigas() {
+  const idsAntigos = ["tipo", "data"];
+  const filtradas = colunas.filter(c => !idsAntigos.includes(c.id));
+  let mudou = filtradas.length !== colunas.length;
+
+  const descricao = filtradas.find(c => c.id === "descricao");
+  if (descricao) {
+    if (!descricao.core) { descricao.core = true; mudou = true; }
+    if (descricao.type === "textarea") { delete descricao.type; mudou = true; }
+  } else {
+    filtradas.unshift({ id: "descricao", label: "Descrição", core: true });
+    mudou = true;
+  }
+
+  if (mudou) {
+    colunas = filtradas;
+    saveStore("colunasEventos", colunas);
+  }
+})();
 
 function defaultColWidth(c) {
   if (c.type === "textarea") return "260px";
-  if (c.type === "select") return "160px";
   return "200px";
 }
 
@@ -46,7 +59,6 @@ function totalAderentes(ev) {
 
 function fieldHtml(c, ev) {
   const val = ev[c.id] ?? "";
-  if (c.type === "select") return `<select data-field="${c.id}">${tipoOptionsHtml(val)}</select>`;
   if (c.type === "textarea") return `<textarea rows="2" data-field="${c.id}">${escapeHtml(val)}</textarea>`;
   return `<input type="text" data-field="${c.id}" value="${escapeHtml(val)}">`;
 }
