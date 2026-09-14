@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { href: "jogos-habituais.html", label: "Jogos Habituais", icon: NAV_ICON_HABITUAIS },
   { href: "jogos-nao-jogados.html", label: "Jogos ainda não jogados", icon: NAV_ICON_NAO_JOGADOS },
   { href: "wishlist.html", label: "Wishlist de Jogos Pagos", icon: NAV_ICON_WISHLIST },
-  { href: "eventos.html", label: "Eventos", icon: NAV_ICON_EVENTOS },
+  { href: "passeios.html", label: "Passeios", icon: NAV_ICON_EVENTOS },
 ];
 
 /* ---------- Dados de exemplo (seed inicial), usados só se ainda não
@@ -74,7 +74,6 @@ const DEFAULT_DATA = {
   colunasEventos: [
     { id: "tipo", label: "Tipo", core: true, type: "select" },
     { id: "descricao", label: "Descrição", type: "textarea" },
-    { id: "data", label: "Data", type: "date" },
   ],
   tiposEvento: ["Escape Room", "Passeio", "Almoço", "Jantar"],
   passwordOverride: null,

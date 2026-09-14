@@ -1,4 +1,4 @@
-initPage("eventos.html");
+initPage("passeios.html");
 
 let eventos = loadStore("eventos");
 let membros = loadStore("membros");
@@ -18,7 +18,6 @@ function tipoOptionsHtml(selected) {
 
 function defaultColWidth(c) {
   if (c.type === "textarea") return "260px";
-  if (c.type === "date") return "150px";
   if (c.type === "select") return "160px";
   return "200px";
 }
@@ -49,7 +48,6 @@ function fieldHtml(c, ev) {
   const val = ev[c.id] ?? "";
   if (c.type === "select") return `<select data-field="${c.id}">${tipoOptionsHtml(val)}</select>`;
   if (c.type === "textarea") return `<textarea rows="2" data-field="${c.id}">${escapeHtml(val)}</textarea>`;
-  if (c.type === "date") return `<input type="date" data-field="${c.id}" value="${escapeHtml(val)}">`;
   return `<input type="text" data-field="${c.id}" value="${escapeHtml(val)}">`;
 }
 
@@ -94,7 +92,7 @@ function render() {
   body.querySelectorAll(".remove-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.idx);
-      if (!confirm("Remover este evento?")) return;
+      if (!confirm("Remover este passeio?")) return;
       eventos.splice(idx, 1);
       persist();
       render();

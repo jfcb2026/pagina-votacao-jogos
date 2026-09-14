@@ -1,6 +1,6 @@
 # Página De Jogos De Amigos
 
-Site partilhado do grupo para votar jogos semanalmente, gerir listas de jogos e organizar eventos.
+Site partilhado do grupo para votar jogos semanalmente, gerir listas de jogos e organizar passeios.
 
 ## Como testar localmente
 
@@ -26,7 +26,7 @@ a password pode ser alterada em qualquer altura na página `backoffice.html`, na
 - `jogos-habituais.html` — lista de jogos habituais do grupo
 - `jogos-nao-jogados.html` — lista de jogos ainda não jogados
 - `wishlist.html` — wishlist de jogos pagos, com reações Like/Dislike
-- `eventos.html` — escape rooms, passeios, almoços e jantares
+- `passeios.html` — escape rooms, passeios, almoços e jantares
 - `backoffice.html` — gestão do site (não está no menu principal)
 - `assets/css/style.css` — estilos (usados por todas as páginas)
 - `assets/js/common.js` — dados partilhados, autenticação, navegação e utilitários
@@ -36,7 +36,7 @@ a password pode ser alterada em qualquer altura na página `backoffice.html`, na
 
 ## Nota sobre persistência de dados
 
-Por agora, os dados (votos, jogos, reações, eventos) ficam guardados no `localStorage` do browser de cada
+Por agora, os dados (votos, jogos, reações, passeios) ficam guardados no `localStorage` do browser de cada
 pessoa — não são partilhados automaticamente entre membros diferentes. O Backoffice tem um botão para
 exportar o estado atual como ficheiros JSON, que podem ser colocados manualmente em `assets/data/` e
 enviados para o repositório. Uma solução de sincronização automática entre todos os membros (por exemplo,

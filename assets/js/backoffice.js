@@ -207,7 +207,7 @@ document.getElementById("clear-historico-btn").addEventListener("click", () => {
   alert("Histórico de vencedores e votação atual limpos.");
 });
 
-/* ---- Tipos de evento ---- */
+/* ---- Tipos de passeio ---- */
 let tipos = loadStore("tiposEvento");
 
 function renderTypes() {
@@ -348,8 +348,8 @@ document.getElementById("export-all-btn").addEventListener("click", () => {
   downloadJson("jogos-habituais.json", loadStore("jogosHabituais"));
   downloadJson("jogos-nao-jogados.json", loadStore("jogosNaoJogados"));
   downloadJson("wishlist.json", loadStore("wishlist"));
-  downloadJson("eventos.json", loadStore("eventos"));
-  downloadJson("tipos-evento.json", loadStore("tiposEvento"));
+  downloadJson("passeios.json", loadStore("eventos"));
+  downloadJson("tipos-passeio.json", loadStore("tiposEvento"));
   downloadJson("votacao.json", loadStore("votacaoSemanal"));
   downloadJson("historico-vencedores.json", loadStore("historicoVencedores"));
   downloadJson("dia-semana-jogo.json", loadStore("diaSemanaJogo"));
