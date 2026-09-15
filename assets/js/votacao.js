@@ -2,6 +2,7 @@ initPage("votacao-semanal.html");
 
 let membros = loadStore("membros");
 let jogosHabituais = loadStore("jogosHabituais");
+let jogosNaoJogados = loadStore("jogosNaoJogados");
 let votacao = loadStore("votacaoSemanal");
 if (typeof votacao.validado !== "boolean") votacao.validado = false;
 
@@ -32,10 +33,25 @@ function hasAnyVote() {
 
 function gameOptionsHtml(selected) {
   let html = `<option value="">—</option>`;
-  jogosHabituais.forEach(j => {
-    const sel = j.jogo === selected ? "selected" : "";
-    html += `<option value="${escapeHtml(j.jogo)}" ${sel}>${escapeHtml(j.jogo)}</option>`;
-  });
+
+  if (jogosHabituais.length) {
+    html += `<optgroup label="Jogos Habituais">`;
+    jogosHabituais.forEach(j => {
+      const sel = j.jogo === selected ? "selected" : "";
+      html += `<option value="${escapeHtml(j.jogo)}" ${sel}>${escapeHtml(j.jogo)}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+
+  if (jogosNaoJogados.length) {
+    html += `<optgroup label="Jogos ainda não jogados">`;
+    jogosNaoJogados.forEach(j => {
+      const sel = j.nome === selected ? "selected" : "";
+      html += `<option value="${escapeHtml(j.nome)}" ${sel}>${escapeHtml(j.nome)}</option>`;
+    });
+    html += `</optgroup>`;
+  }
+
   return html;
 }
 
