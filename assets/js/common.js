@@ -148,10 +148,22 @@ function nextGameDateLabel(diaSemana, fromDate) {
 
 function storageKey(name) { return "jogosAmigos_" + name; }
 
+/* Alguns browsers (ex.: Safari com "Bloquear todos os cookies" ativo, ou
+   navegação privada muito restritiva) recusam o acesso ao localStorage e
+   isso lança um erro. Em vez de a página inteira deixar de funcionar
+   nesse caso, usa-se este objeto em memória como rede de segurança: os
+   dados não ficam guardados entre visitas, mas o site continua a
+   funcionar durante a sessão. */
+const _memoryStore = {};
+
 function loadStore(name) {
-  const raw = localStorage.getItem(storageKey(name));
-  if (raw !== null) {
-    try { return JSON.parse(raw); } catch (e) { /* segue para o default */ }
+  try {
+    const raw = localStorage.getItem(storageKey(name));
+    if (raw !== null) {
+      try { return JSON.parse(raw); } catch (e) { /* segue para o default */ }
+    }
+  } catch (e) {
+    if (name in _memoryStore) return _memoryStore[name];
   }
   const seed = JSON.parse(JSON.stringify(DEFAULT_DATA[name]));
   saveStore(name, seed);
@@ -159,7 +171,11 @@ function loadStore(name) {
 }
 
 function saveStore(name, data) {
-  localStorage.setItem(storageKey(name), JSON.stringify(data));
+  try {
+    localStorage.setItem(storageKey(name), JSON.stringify(data));
+  } catch (e) {
+    _memoryStore[name] = data;
+  }
   pushToCloud(name, data);
 }
 
