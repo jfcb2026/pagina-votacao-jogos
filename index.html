@@ -55,13 +55,36 @@ try {
   const input = document.getElementById("password-input");
   const error = document.getElementById("login-error");
 
+  function doLogin() {
+    try { sessionStorage.setItem("jogosAmigos_auth", "ok"); } catch (e) { /* ignora */ }
+    window.location.href = redirectDestination();
+  }
+
   function tryLogin() {
-    if (input.value === getActivePasswordFast()) {
-      try { sessionStorage.setItem("jogosAmigos_auth", "ok"); } catch (e) { /* ignora */ }
-      window.location.href = redirectDestination();
-    } else {
-      error.textContent = "Password incorreta.";
+    const typed = input.value;
+    if (typed === getActivePasswordFast()) {
+      doLogin();
+      return;
     }
+    /* Se a password foi alterada no Backoffice e este é o primeiro
+       carregamento do site neste browser, essa alteração ainda pode não
+       ter chegado da nuvem (isso acontece em segundo plano, mal as
+       bibliotecas do Firebase terminem de carregar). Em vez de dizer logo
+       que a password está errada, espera um pouco por essa sincronização
+       e volta a validar antes de mostrar o erro. */
+    error.textContent = "A verificar...";
+    const deadline = Date.now() + 4000;
+    (function recheck() {
+      if (typed === getActivePasswordFast()) {
+        doLogin();
+        return;
+      }
+      if (Date.now() < deadline) {
+        setTimeout(recheck, 250);
+      } else {
+        error.textContent = "Password incorreta.";
+      }
+    })();
   }
 
   document.getElementById("login-btn").addEventListener("click", tryLogin);
