@@ -19,31 +19,45 @@
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js"></script>
 <script>
+/* Este pequeno bloco corre logo a seguir ao formulário, ANTES de se
+   carregarem as bibliotecas do Firebase (que vêm de um CDN externo e, num
+   browser completamente limpo/anónimo sem nada em cache, podem demorar
+   alguns segundos a transferir). Sem isto, o botão "Entrar" só ficava
+   ativo depois de essas bibliotecas todas terminarem de carregar — a
+   página parecia pronta mas um clique nesse intervalo não fazia nada, daí
+   parecer "sem reação" só na primeira visita e passar a funcionar com um
+   simples refresh (a partir do momento em que o browser já tinha tudo em
+   cache). Este bloco não depende de nada externo, por isso fica sempre
+   pronto de imediato. */
 try {
-  document.getElementById("site-name-heading").textContent = "🎮 " + loadStore("nomeSite");
-
   function redirectDestination() {
     const target = sessionStorage.getItem("jogosAmigos_redirect");
     sessionStorage.removeItem("jogosAmigos_redirect");
     return target || "votacao-semanal.html";
   }
 
-  if (isAuthenticated()) {
+  if (sessionStorage.getItem("jogosAmigos_auth") === "ok") {
     window.location.href = redirectDestination();
+  }
+
+  function getActivePasswordFast() {
+    try {
+      const raw = localStorage.getItem("jogosAmigos_passwordOverride");
+      if (raw !== null) {
+        const override = JSON.parse(raw);
+        if (override) return override;
+      }
+    } catch (e) { /* sem acesso a localStorage: segue para a password por defeito */ }
+    return "alterar123";
   }
 
   const input = document.getElementById("password-input");
   const error = document.getElementById("login-error");
 
   function tryLogin() {
-    if (input.value === getActivePassword()) {
-      sessionStorage.setItem("jogosAmigos_auth", "ok");
+    if (input.value === getActivePasswordFast()) {
+      try { sessionStorage.setItem("jogosAmigos_auth", "ok"); } catch (e) { /* ignora */ }
       window.location.href = redirectDestination();
     } else {
       error.textContent = "Password incorreta.";
@@ -53,14 +67,24 @@ try {
   document.getElementById("login-btn").addEventListener("click", tryLogin);
   input.addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
 } catch (e) {
-  /* Se o browser estiver a bloquear o acesso a dados locais (cookies
-     desativados, navegação privada muito restritiva, etc.), o site não
-     consegue funcionar, mas em vez de ficar sem reação nenhuma, mostra
-     esta mensagem para se perceber o que se passa. */
   document.getElementById("login-error").textContent =
     "Não foi possível carregar o site neste browser. Verifica se os cookies/dados do site estão permitidos (não estás em navegação privada com bloqueio total) e tenta novamente.";
   console.error("Erro ao carregar o site:", e);
 }
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+/* Depois de tudo carregado, só atualiza o título com o nome do site
+   (personalizável no Backoffice) — isto é apenas estético e nunca deve
+   bloquear o login, por isso corre à parte, depois do bloco de cima. */
+try {
+  document.getElementById("site-name-heading").textContent = "🎮 " + loadStore("nomeSite");
+} catch (e) { /* mantém o título por defeito */ }
 </script>
 </body>
 </html>
