@@ -42,6 +42,16 @@
     </div>
 
     <div class="backoffice-section">
+      <h2>Votação do Dia de Jogo — Horário</h2>
+      <p class="hint">Horário mostrado no topo da página de Votação do Dia de Jogo (ex: "21h").</p>
+      <div class="inline-form">
+        <input type="text" id="horario-jogo-input" placeholder="ex: 21h">
+        <button class="primary" id="save-horario-jogo-btn">Guardar</button>
+      </div>
+      <p class="hint" id="horario-jogo-msg"></p>
+    </div>
+
+    <div class="backoffice-section">
       <h2>Votação Semanal — Slots de Jogo</h2>
       <p class="hint">Número de jogos que cada membro pode votar por semana (colunas "Jogo 1", "Jogo 2", ...).</p>
       <div class="inline-form">
@@ -85,10 +95,11 @@
 
     <div class="backoffice-section">
       <h2>Esvaziar Listas de Jogos</h2>
-      <p class="hint">Remove todos os jogos das listas de Jogos Habituais e Jogos ainda não jogados.</p>
+      <p class="hint">Remove todos os jogos das listas de Jogos Habituais, Jogos ainda não jogados e Links.</p>
       <div class="actions-row">
         <button class="danger" id="empty-habituais-btn">Esvaziar Jogos Habituais</button>
         <button class="danger" id="empty-nao-jogados-btn">Esvaziar Jogos ainda não jogados</button>
+        <button class="danger" id="empty-links-btn">Esvaziar Links</button>
       </div>
     </div>
 
@@ -122,6 +133,13 @@
       <div class="inline-form">
         <input type="text" id="new-col-eventos" placeholder="Nome da nova coluna">
         <button class="primary" id="add-col-eventos-btn">Adicionar</button>
+      </div>
+
+      <h3 class="theme-group-title" style="margin-top:18px">Links</h3>
+      <div id="cols-links" class="column-editor"></div>
+      <div class="inline-form">
+        <input type="text" id="new-col-links" placeholder="Nome da nova coluna">
+        <button class="primary" id="add-col-links-btn">Adicionar</button>
       </div>
     </div>
 
@@ -174,7 +192,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js"></script>
+<script src="assets/js/common.js?v=4"></script>
 <script src="assets/js/backoffice.js"></script>
 </body>
 </html>

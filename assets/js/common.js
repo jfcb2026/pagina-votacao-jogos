@@ -4,16 +4,20 @@
 /* Ícones do menu principal (definidos aqui em cima para poderem ser usados
    já em NAV_ITEMS, mais abaixo) */
 const NAV_ICON_VOTACAO = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><polyline points="8 12 11 15 16 9"></polyline></svg>';
-const NAV_ICON_HABITUAIS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>';
+const NAV_ICON_HABITUAIS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
 const NAV_ICON_NAO_JOGADOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
 const NAV_ICON_WISHLIST = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 7.5c-1.2-1.5-3-2.5-5-2.5-3.6 0-6.5 3.1-6.5 7s2.9 7 6.5 7c2 0 3.8-1 5-2.5"></path><line x1="3" y1="10" x2="13" y2="10"></line><line x1="3" y1="14" x2="12" y2="14"></line></svg>';
 const NAV_ICON_EVENTOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"></path><rect x="3" y="11" width="18" height="6" rx="2"></rect><circle cx="7.5" cy="17.5" r="1.5"></circle><circle cx="16.5" cy="17.5" r="1.5"></circle></svg>';
+const NAV_ICON_LINKS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.5 1.5"></path><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.5-1.5"></path></svg>';
+const NAV_ICON_VOTACAO_DIA = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="M8 14l2 2 4-4"></path></svg>';
 
 const NAV_ITEMS = [
-  { href: "votacao-semanal.html", label: "Votação Semanal", icon: NAV_ICON_VOTACAO },
+  { href: "votacao-semanal.html", label: "Votação do Jogo Semanal", icon: NAV_ICON_VOTACAO },
   { href: "jogos-habituais.html", label: "Jogos Habituais", icon: NAV_ICON_HABITUAIS },
   { href: "jogos-nao-jogados.html", label: "Jogos ainda não jogados", icon: NAV_ICON_NAO_JOGADOS },
   { href: "wishlist.html", label: "Wishlist de Jogos Pagos", icon: NAV_ICON_WISHLIST },
+  { href: "votacao-dia.html", label: "Votação do Dia de Jogo", icon: NAV_ICON_VOTACAO_DIA },
+  { href: "links.html", label: "Links", icon: NAV_ICON_LINKS },
   { href: "passeios.html", label: "Passeios", icon: NAV_ICON_EVENTOS },
 ];
 
@@ -74,9 +78,16 @@ const DEFAULT_DATA = {
   colunasEventos: [
     { id: "descricao", label: "Descrição", core: true },
   ],
+  links: [],
+  colunasLinks: [
+    { id: "nome", label: "Nome", core: true },
+    { id: "link", label: "Link" },
+  ],
   passwordOverride: null,
   votacaoSemanal: { slots: 2, votos: {}, validado: false, confirmado: false },
   historicoVencedores: [],
+  votacaoDia: { voto: {} },
+  horarioJogo: "21h",
   diaSemanaJogo: 4, // 0 = Domingo ... 4 = Quinta-Feira
   tema: "midnight",
   nomeSite: "Página De Jogos De Amigos",
@@ -197,9 +208,9 @@ function emptyStore(name, emptyValue) {
    como antes desta funcionalidade existir. */
 
 const CLOUD_SYNC_KEYS = [
-  "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos",
-  "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos",
-  "votacaoSemanal", "historicoVencedores", "diaSemanaJogo",
+  "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos", "links",
+  "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos", "colunasLinks",
+  "votacaoSemanal", "historicoVencedores", "votacaoDia", "diaSemanaJogo", "horarioJogo",
   "nomeSite", "passwordOverride",
 ];
 
@@ -316,6 +327,12 @@ function renameMemberEverywhere(oldName, newName) {
     delete votacao.votos[oldName];
     saveStore("votacaoSemanal", votacao);
   }
+  const votacaoDia = loadStore("votacaoDia");
+  if (votacaoDia.voto && oldName in votacaoDia.voto) {
+    votacaoDia.voto[newName] = votacaoDia.voto[oldName];
+    delete votacaoDia.voto[oldName];
+    saveStore("votacaoDia", votacaoDia);
+  }
   const wishlist = loadStore("wishlist");
   wishlist.forEach(j => {
     if (j.reacoes && oldName in j.reacoes) {
@@ -338,6 +355,9 @@ function renameMemberEverywhere(oldName, newName) {
 function removeMemberEverywhere(name) {
   const votacao = loadStore("votacaoSemanal");
   if (votacao.votos) { delete votacao.votos[name]; saveStore("votacaoSemanal", votacao); }
+
+  const votacaoDia = loadStore("votacaoDia");
+  if (votacaoDia.voto) { delete votacaoDia.voto[name]; saveStore("votacaoDia", votacaoDia); }
 
   const wishlist = loadStore("wishlist");
   wishlist.forEach(j => { if (j.reacoes) delete j.reacoes[name]; });
@@ -447,6 +467,8 @@ const PLUS_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" widt
 const SAVE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>';
 
 const MIGRATE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+
+const CALENDAR_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
 
 const CLOUD_UPLOAD_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path><polyline points="12 12 12 21"></polyline><polyline points="9 15 12 12 15 15"></polyline></svg>';
 

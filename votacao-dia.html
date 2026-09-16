@@ -3,28 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jogos Habituais — Página De Jogos De Amigos</title>
+<title>Votação do Dia de Jogo — Página De Jogos De Amigos</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <script>try{var t=JSON.parse(localStorage.getItem("jogosAmigos_tema"));if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
 </head>
 <body>
 <main>
-  <h1>Jogos Habituais</h1>
-  <p class="subtitle">Lista de jogos que o grupo costuma jogar. Alimenta as opções da Votação Semanal.</p>
+  <h1>Votação do Dia de Jogo</h1>
+  <p class="subtitle">Marca todos os dias (de segunda a sexta) em que consegues jogar. Podes marcar vários dias, até todos. <strong>Fica guardado automaticamente</strong> assim que marcas ou desmarcas.</p>
+  <p class="subtitle" id="horario-label" style="margin-top:-6px"></p>
 
   <div class="card card-fit">
-    <p class="hint" id="import-hint" style="margin-top:0"></p>
     <div class="table-scroll">
-      <table id="habituais-table">
-        <thead><tr id="table-head"></tr></thead>
-        <tbody id="table-body"></tbody>
+      <table id="votacao-dia-table">
+        <thead><tr id="votacao-dia-head"></tr></thead>
+        <tbody id="votacao-dia-body"></tbody>
+        <tfoot><tr id="votacao-dia-total"></tr></tfoot>
       </table>
     </div>
-    <div class="actions-row" style="margin-top:14px; margin-bottom:0">
-      <button class="primary" id="add-jogo-btn">+ Jogo</button>
-      <button id="import-btn">Importar de Excel</button>
-      <input type="file" id="import-input" accept=".xlsx,.xls,.csv" style="display:none">
-    </div>
+  </div>
+
+  <div class="card card-sync" id="resultado-dia-card" style="display:none">
+    <h2 style="margin-top:0">Dia com Mais Votos</h2>
+    <div id="resultado-dia-box"></div>
   </div>
 </main>
 
@@ -32,7 +33,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/common.js?v=4"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="assets/js/jogos-habituais.js"></script>
+<script src="assets/js/votacao-dia.js?v=4"></script>
 </body>
 </html>
