@@ -3,6 +3,7 @@ initPage("votacao-dia.html");
 let membros = loadStore("membros");
 let votacaoDia = loadStore("votacaoDia");
 if (!votacaoDia.voto) votacaoDia.voto = {};
+if (typeof votacaoDia.aplicado !== "boolean") votacaoDia.aplicado = false;
 
 const DIAS = ["2f", "3f", "4f", "5f", "6f"];
 const DIAS_LABEL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
@@ -33,11 +34,11 @@ function renderHead() {
     colgroup = document.createElement("colgroup");
     table.insertBefore(colgroup, table.firstChild);
   }
-  colgroup.innerHTML = `<col style="width:180px">` +
-    DIAS.map(() => `<col style="width:120px">`).join("");
+  colgroup.innerHTML = `<col style="width:170px">` +
+    DIAS.map(() => `<col style="width:150px">`).join("");
 
   document.getElementById("votacao-dia-head").innerHTML = `<th>Membro</th>` +
-    DIAS.map((d, i) => `<th title="${escapeHtml(DIAS_LABEL[i])}-feira">${d}</th>`).join("");
+    DIAS_LABEL.map(nome => `<th>${escapeHtml(nome)}-Feira</th>`).join("");
 }
 
 function syncTableWidth() {
@@ -90,9 +91,37 @@ function renderTotals() {
     totals.map(n => `<td class="text-center dia-total${n === max && max > 0 ? " dia-total-max" : ""}">${n}</td>`).join("");
 }
 
+/* Botão para limpar só os votos (mantém o dia já aplicado no Backoffice)
+   e começar uma nova ronda de votação. Só aparece depois de "Aplicar como
+   Dia da Semana" ter sido usado. */
+function reiniciarVotacaoDia() {
+  if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável para uma nova ronda.")) return;
+  Object.keys(votacaoDia.voto).forEach(m => {
+    votacaoDia.voto[m] = votacaoDia.voto[m].map(() => false);
+  });
+  votacaoDia.aplicado = false;
+  persist();
+  render();
+}
+
+function botaoReiniciarHtml() {
+  if (!votacaoDia.aplicado) return "";
+  return `
+    <div class="actions-row" style="margin-top:14px; margin-bottom:0; justify-content:center">
+      <button class="danger" id="reiniciar-votacao-dia-btn">Reiniciar Votação${REFRESH_ICON}</button>
+    </div>
+  `;
+}
+
+function ligarBotaoReiniciar() {
+  const btn = document.getElementById("reiniciar-votacao-dia-btn");
+  if (btn) btn.addEventListener("click", reiniciarVotacaoDia);
+}
+
 /* Mostra qual o dia com mais votos e permite aplicá-lo como "Dia de Jogo"
    (usado na Votação do Jogo Semanal para calcular a próxima sessão). Em
-   caso de empate, deixa escolher qual dos dias empatados aplicar. */
+   caso de empate, deixa escolher qual dos dias empatados aplicar. Depois
+   de aplicado, passa a mostrar também o botão de Reiniciar Votação. */
 function renderResultadoDia() {
   const totals = computeTotals();
   const max = Math.max(...totals, 0);
@@ -110,8 +139,9 @@ function renderResultadoDia() {
 
   function aplicarDia(idx) {
     saveStore("diaSemanaJogo", DIAS_WEEKDAY_INDEX[idx]);
-    const msg = document.getElementById("aplicar-dia-msg");
-    if (msg) msg.textContent = `Dia da semana atualizado para ${DIAS_LABEL[idx]}-Feira.`;
+    votacaoDia.aplicado = true;
+    persist();
+    renderResultadoDia();
   }
 
   if (empatados.length === 1) {
@@ -121,7 +151,8 @@ function renderResultadoDia() {
       <div class="actions-row" style="margin-bottom:0; justify-content:center">
         <button class="primary" id="aplicar-dia-btn">Aplicar como Dia da Semana${CALENDAR_ICON}</button>
       </div>
-      <p class="hint" id="aplicar-dia-msg" style="text-align:center"></p>
+      <p class="hint" id="aplicar-dia-msg" style="text-align:center">${votacaoDia.aplicado ? `Dia da semana atualizado para ${escapeHtml(DIAS_LABEL[dia.i])}-Feira.` : ""}</p>
+      ${botaoReiniciarHtml()}
     `;
     document.getElementById("aplicar-dia-btn").addEventListener("click", () => aplicarDia(dia.i));
   } else {
@@ -132,11 +163,14 @@ function renderResultadoDia() {
         <button class="primary" id="aplicar-dia-btn">Aplicar como Dia da Semana${CALENDAR_ICON}</button>
       </div>
       <p class="hint" id="aplicar-dia-msg" style="text-align:center"></p>
+      ${botaoReiniciarHtml()}
     `;
     document.getElementById("aplicar-dia-btn").addEventListener("click", () => {
       aplicarDia(Number(document.getElementById("desempate-select").value));
     });
   }
+
+  ligarBotaoReiniciar();
 }
 
 function syncCardWidths() {

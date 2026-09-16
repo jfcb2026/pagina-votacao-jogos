@@ -86,7 +86,7 @@ const DEFAULT_DATA = {
   passwordOverride: null,
   votacaoSemanal: { slots: 2, votos: {}, validado: false, confirmado: false },
   historicoVencedores: [],
-  votacaoDia: { voto: {} },
+  votacaoDia: { voto: {}, aplicado: false },
   horarioJogo: "21h",
   diaSemanaJogo: 4, // 0 = Domingo ... 4 = Quinta-Feira
   tema: "midnight",
