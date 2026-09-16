@@ -17,6 +17,7 @@ document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser
 document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
 document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
 document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloqueio da Votação${UNLOCK_ICON}`;
+document.getElementById("clear-votacao-atual-btn").innerHTML = `Limpar Votação Atual${TRASH_ICON}`;
 
 /* ---- Sincronização com a nuvem ---- */
 document.getElementById("sync-push-btn").addEventListener("click", () => {
@@ -202,6 +203,18 @@ document.getElementById("force-unlock-votacao-btn").addEventListener("click", ()
   saveStore("votacaoSemanal", votacao);
   renderSlots();
   document.getElementById("force-unlock-msg").textContent = "Votação desbloqueada.";
+});
+
+document.getElementById("clear-votacao-atual-btn").addEventListener("click", () => {
+  if (!confirm("Limpar por completo a votação atual? Todos os votos dados são apagados (o histórico de vencedores anteriores não é afetado) e a tabela volta a ficar editável para uma nova ronda.")) return;
+  votacao.validado = false;
+  votacao.confirmado = false;
+  Object.keys(votacao.votos).forEach(m => {
+    votacao.votos[m] = votacao.votos[m].map(() => "");
+  });
+  saveStore("votacaoSemanal", votacao);
+  renderSlots();
+  document.getElementById("clear-votacao-atual-msg").textContent = "Votação atual limpa.";
 });
 
 /* ---- Histórico de Vencedores ---- */

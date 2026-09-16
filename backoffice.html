@@ -53,12 +53,17 @@
     </div>
 
     <div class="backoffice-section">
-      <h2>Votação Semanal — Desbloquear Votação</h2>
+      <h2>Votação Semanal — Ações de Emergência</h2>
       <p class="hint">Botão de segurança: força a reabertura da votação atual (por exemplo, se outro separador tiver sincronizado um resultado já validado por engano). Os votos dados até agora não são apagados.</p>
       <div class="actions-row">
         <button class="danger" id="force-unlock-votacao-btn">Forçar Desbloqueio da Votação</button>
       </div>
       <p class="hint" id="force-unlock-msg"></p>
+      <p class="hint" style="margin-top:14px">Limpa por completo a votação atual (todos os votos dados), sem apagar o histórico de vencedores anteriores. A tabela volta a ficar editável para uma nova ronda.</p>
+      <div class="actions-row">
+        <button class="danger" id="clear-votacao-atual-btn">Limpar Votação Atual</button>
+      </div>
+      <p class="hint" id="clear-votacao-atual-msg"></p>
     </div>
 
     <div class="backoffice-section">
