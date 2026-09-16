@@ -7,8 +7,12 @@ let votacao = loadStore("votacaoSemanal");
 if (typeof votacao.validado !== "boolean") votacao.validado = false;
 if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
 
-document.getElementById("dia-jogo-label").innerHTML =
-  `<strong>Próxima Sessão de Jogo:</strong> ${escapeHtml(nextGameDateLabel(loadStore("diaSemanaJogo")))}`;
+(function renderDiaJogoLabel() {
+  const dataLabel = nextGameDateLabel(loadStore("diaSemanaJogo"));
+  const horario = loadStore("horarioJogo");
+  document.getElementById("dia-jogo-label").innerHTML =
+    `<strong>Próxima Sessão de Jogo:</strong> ${escapeHtml(dataLabel)}${horario ? ` às ${escapeHtml(horario)}` : ""}`;
+})();
 
 document.getElementById("fechar-votacao-btn").innerHTML = `Fechar Votação${LOCK_ICON}`;
 document.getElementById("desbloquear-votos-btn").innerHTML = `Reabrir Votação${UNLOCK_ICON}`;

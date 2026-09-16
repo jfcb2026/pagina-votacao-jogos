@@ -6,26 +6,22 @@ let colunas = loadStore("colunasEventos");
 
 function persist() { saveStore("eventos", eventos); }
 
-/* Migração: browsers que já tinham a tabela antiga (com colunas "Tipo" e
-   "Data", entretanto descontinuadas, e "Descrição" como textarea) ficam só
-   com "Descrição" como campo de texto simples. Corre uma vez por browser
-   e sincroniza a limpeza para todos via saveStore. */
-(function migrarColunasAntigas() {
-  const idsAntigos = ["tipo", "data"];
-  const filtradas = colunas.filter(c => !idsAntigos.includes(c.id));
-  let mudou = filtradas.length !== colunas.length;
-
-  const descricao = filtradas.find(c => c.id === "descricao");
+/* Garante que a coluna "Descrição" existe e está corretamente configurada
+   (campo de texto simples, não removível). Não mexe em mais nenhuma coluna
+   — colunas com id "tipo" ou "data" já não são tratadas como legado, podem
+   agora ser criadas livremente no Backoffice. */
+(function garantirColunaDescricao() {
+  let mudou = false;
+  const descricao = colunas.find(c => c.id === "descricao");
   if (descricao) {
     if (!descricao.core) { descricao.core = true; mudou = true; }
     if (descricao.type === "textarea") { delete descricao.type; mudou = true; }
   } else {
-    filtradas.unshift({ id: "descricao", label: "Descrição", core: true });
+    colunas.unshift({ id: "descricao", label: "Descrição", core: true });
     mudou = true;
   }
 
   if (mudou) {
-    colunas = filtradas;
     saveStore("colunasEventos", colunas);
   }
 })();

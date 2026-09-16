@@ -6,13 +6,16 @@ document.getElementById("add-col-habituais-btn").innerHTML = `Adicionar${PLUS_IC
 document.getElementById("add-col-nao-jogados-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-wishlist-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-eventos-btn").innerHTML = `Adicionar${PLUS_ICON}`;
+document.getElementById("add-col-links-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("clear-historico-btn").innerHTML = `Limpar histórico de vencedores${TRASH_ICON}`;
 document.getElementById("clear-reactions-btn").innerHTML = `Limpar reações (Likes/Dislikes)${REFRESH_ICON}`;
 document.getElementById("empty-wishlist-btn").innerHTML = `Esvaziar lista da Wishlist${TRASH_ICON}`;
 document.getElementById("empty-habituais-btn").innerHTML = `Esvaziar Jogos Habituais${TRASH_ICON}`;
 document.getElementById("empty-nao-jogados-btn").innerHTML = `Esvaziar Jogos ainda não jogados${TRASH_ICON}`;
+document.getElementById("empty-links-btn").innerHTML = `Esvaziar Links${TRASH_ICON}`;
 document.getElementById("save-password-btn").innerHTML = `Guardar nova password${SAVE_ICON}`;
 document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
+document.getElementById("save-horario-jogo-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
 document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
 document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
@@ -154,6 +157,15 @@ document.getElementById("dia-jogo-select").addEventListener("change", e => {
 
 renderDiaJogo();
 
+/* ---- Votação do Dia de Jogo — Horário ---- */
+document.getElementById("horario-jogo-input").value = loadStore("horarioJogo");
+document.getElementById("save-horario-jogo-btn").addEventListener("click", () => {
+  const val = document.getElementById("horario-jogo-input").value.trim();
+  if (!val) { document.getElementById("horario-jogo-msg").textContent = "Escreve um horário."; return; }
+  saveStore("horarioJogo", val);
+  document.getElementById("horario-jogo-msg").textContent = "Horário atualizado.";
+});
+
 /* ---- Votação Semanal — Slots de Jogo ---- */
 let votacao = loadStore("votacaoSemanal");
 
@@ -260,6 +272,12 @@ document.getElementById("empty-nao-jogados-btn").addEventListener("click", () =>
   alert("Jogos ainda não jogados esvaziados.");
 });
 
+document.getElementById("empty-links-btn").addEventListener("click", () => {
+  if (!confirm("Esvaziar por completo a lista de Links? Esta ação não pode ser desfeita.")) return;
+  emptyStore("links", []);
+  alert("Links esvaziados.");
+});
+
 /* ---- Colunas das tabelas de jogos ---- */
 function initColumnManager(storageName, listElId, inputElId, addBtnId) {
   let colunas = loadStore(storageName);
@@ -337,6 +355,7 @@ initColumnManager("colunasHabituais", "cols-habituais", "new-col-habituais", "ad
 initColumnManager("colunasNaoJogados", "cols-nao-jogados", "new-col-nao-jogados", "add-col-nao-jogados-btn");
 initColumnManager("colunasWishlist", "cols-wishlist", "new-col-wishlist", "add-col-wishlist-btn");
 initColumnManager("colunasEventos", "cols-eventos", "new-col-eventos", "add-col-eventos-btn");
+initColumnManager("colunasLinks", "cols-links", "new-col-links", "add-col-links-btn");
 
 /* ---- Exportar dados ---- */
 document.getElementById("export-all-btn").addEventListener("click", () => {
@@ -348,6 +367,7 @@ document.getElementById("export-all-btn").addEventListener("click", () => {
   downloadJson("votacao.json", loadStore("votacaoSemanal"));
   downloadJson("historico-vencedores.json", loadStore("historicoVencedores"));
   downloadJson("dia-semana-jogo.json", loadStore("diaSemanaJogo"));
+  downloadJson("links.json", loadStore("links"));
 });
 
 /* ---- Cópia de Segurança (Backup) ----

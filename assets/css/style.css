@@ -324,24 +324,28 @@ button.primary:hover { background: var(--accent-dark); }
 #validar-btn.primary,
 #add-jogo-btn.primary,
 #add-evento-btn.primary,
+#add-link-btn.primary,
 #add-member-btn.primary,
 #add-type-btn.primary,
 #add-col-habituais-btn.primary,
 #add-col-nao-jogados-btn.primary,
 #add-col-wishlist-btn.primary,
-#add-col-eventos-btn.primary {
+#add-col-eventos-btn.primary,
+#add-col-links-btn.primary {
   background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)), var(--good);
   border-color: var(--good);
 }
 #validar-btn.primary:hover,
 #add-jogo-btn.primary:hover,
 #add-evento-btn.primary:hover,
+#add-link-btn.primary:hover,
 #add-member-btn.primary:hover,
 #add-type-btn.primary:hover,
 #add-col-habituais-btn.primary:hover,
 #add-col-nao-jogados-btn.primary:hover,
 #add-col-wishlist-btn.primary:hover,
-#add-col-eventos-btn.primary:hover {
+#add-col-eventos-btn.primary:hover,
+#add-col-links-btn.primary:hover {
   background: linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.34)), var(--good);
 }
 
@@ -455,11 +459,11 @@ table input[type="text"], table input[type="date"], table select, table textarea
    ajustável arrastando o limite direito de cada cabeçalho (ver .col-resizer
    e initColumnResize em common.js); as larguras iniciais e o layout de cada
    coluna são definidos em JS, ao construir o colgroup de cada tabela. */
-#habituais-table, #nao-jogados-table, #wishlist-table {
+#habituais-table, #nao-jogados-table, #wishlist-table, #links-table {
   table-layout: fixed;
   min-width: 0;
 }
-#habituais-table { width: auto; }
+#habituais-table, #links-table { width: auto; }
 #nao-jogados-table, #wishlist-table { width: 100%; }
 
 /* Votação Semanal: a tabela deixa de esticar para preencher o cartão, e as
@@ -468,6 +472,12 @@ table input[type="text"], table input[type="date"], table select, table textarea
    que os slots sejam reduzidos para 1; com 3+ jogos cresce normalmente. */
 #votacao-table { width: auto; min-width: 600px; }
 #votacao-table select { width: 216px; min-width: 0; display: block; margin: 0 auto; }
+#votacao-dia-table { width: auto; min-width: 320px; table-layout: fixed; }
+#votacao-dia-table th, #votacao-dia-table td { text-align: center; padding: 12px 10px; font-size: 0.95rem; }
+#votacao-dia-table th:first-child, #votacao-dia-table td:first-child { text-align: left; }
+#votacao-dia-table input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--accent); cursor: pointer; }
+#votacao-dia-table tfoot td { font-weight: 700; padding: 12px 10px; }
+#votacao-dia-table tfoot td.dia-total-max { background: var(--good); color: #08221a; border-radius: 4px; }
 .table-scroll-fit { width: fit-content; max-width: 100%; margin: 0 auto; }
 
 .votacao-wrap { width: fit-content; max-width: 100%; margin: 0 auto; }
