@@ -143,6 +143,17 @@
         <button id="export-all-btn">Exportar tudo</button>
       </div>
     </div>
+
+    <div class="backoffice-section">
+      <h2>Cópia de Segurança (Backup)</h2>
+      <p class="hint">Guarda todos os dados do site (membros, jogos, votação, passeios, histórico, password, etc.) num único ficheiro. Usa "Importar Backup" para repor esses dados, caso alguma vez seja preciso.</p>
+      <div class="actions-row">
+        <button id="export-backup-btn">Exportar Backup</button>
+        <button id="import-backup-btn">Importar Backup</button>
+        <input type="file" id="import-backup-input" accept=".json" style="display:none">
+      </div>
+      <p class="hint" id="backup-msg"></p>
+    </div>
   </div>
 </main>
 

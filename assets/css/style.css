@@ -472,7 +472,8 @@ table input[type="text"], table input[type="date"], table select, table textarea
 
 .votacao-wrap { width: fit-content; max-width: 100%; margin: 0 auto; }
 .votacao-wrap .table-scroll { width: fit-content; max-width: 100%; }
-.votacao-wrap .actions-row { width: 100%; justify-content: center; }
+.votacao-wrap .actions-row,
+.votacao-resultados-actions { width: 100%; justify-content: center; }
 
 .card-half { width: 75%; margin-left: auto; margin-right: auto; }
 @media (max-width: 900px) {
@@ -644,6 +645,8 @@ table input[type="text"], table input[type="date"], table select, table textarea
 .backoffice-section:last-child { border-bottom: none; }
 
 .hint { color: var(--text-dim); font-size: 0.8rem; margin-top: 6px; }
+
+.voto-feedback { color: var(--good); font-size: 0.95rem; font-weight: 600; }
 
 .type-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
 .type-chip {

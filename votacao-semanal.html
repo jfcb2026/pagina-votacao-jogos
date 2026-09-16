@@ -10,8 +10,9 @@
 <body>
 <main>
   <h1>Votação Semanal</h1>
-  <p class="subtitle">Cada membro escolhe os jogos que quer votar. Uma célula preenchida conta 1 voto para o jogo escolhido.</p>
+  <p class="subtitle">Cada membro escolhe os jogos que quer votar diretamente na tabela. <strong>O voto é guardado automaticamente</strong> assim que selecionas um jogo, <strong>não é preciso carregar em mais nada</strong>.</p>
   <p class="subtitle" id="dia-jogo-label" style="margin-top:-6px"></p>
+  <p class="voto-feedback" id="voto-feedback" style="min-height:18px; margin:0 0 8px; text-align:center;"></p>
 
   <div class="card card-fit">
     <div class="votacao-wrap">
@@ -21,17 +22,22 @@
           <tbody id="votacao-body"></tbody>
         </table>
       </div>
-      <div class="actions-row" style="margin-top:14px; margin-bottom:0; align-items:center;">
-        <button class="primary" id="validar-btn">Validar Votos</button>
-        <button class="danger" id="reiniciar-btn" style="display:none">Reiniciar Votos</button>
-        <span class="login-error" id="validar-erro" style="min-height:auto;"></span>
-      </div>
     </div>
   </div>
 
   <div class="card card-sync">
     <h2 style="margin-top:0">Resultados</h2>
     <ul class="results-list" id="results-list"></ul>
+    <div class="actions-row votacao-resultados-actions" style="margin-top:14px; margin-bottom:0; align-items:center;">
+      <button class="primary" id="fechar-votacao-btn">Fechar Votação</button>
+      <button class="primary" id="desbloquear-votos-btn" style="display:none">Reabrir Votação</button>
+      <button class="primary" id="validar-btn" style="display:none">Validar Votos</button>
+      <button class="danger" id="reiniciar-votacao-btn" style="display:none">Reiniciar Votação</button>
+      <span class="login-error" id="validar-erro" style="min-height:auto;"></span>
+    </div>
+  </div>
+
+  <div class="card card-sync" id="winner-card" style="display:none">
     <div id="winner-box"></div>
   </div>
 

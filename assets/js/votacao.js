@@ -5,12 +5,15 @@ let jogosHabituais = loadStore("jogosHabituais");
 let jogosNaoJogados = loadStore("jogosNaoJogados");
 let votacao = loadStore("votacaoSemanal");
 if (typeof votacao.validado !== "boolean") votacao.validado = false;
+if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
 
 document.getElementById("dia-jogo-label").innerHTML =
   `<strong>Próxima Sessão de Jogo:</strong> ${escapeHtml(nextGameDateLabel(loadStore("diaSemanaJogo")))}`;
 
+document.getElementById("fechar-votacao-btn").innerHTML = `Fechar Votação${LOCK_ICON}`;
+document.getElementById("desbloquear-votos-btn").innerHTML = `Reabrir Votação${UNLOCK_ICON}`;
 document.getElementById("validar-btn").innerHTML = `Validar Votos${CHECK_ICON}`;
-document.getElementById("reiniciar-btn").innerHTML = `Reiniciar Votos${REFRESH_ICON}`;
+document.getElementById("reiniciar-votacao-btn").innerHTML = `Reiniciar Votação${REFRESH_ICON}`;
 
 function ensureVotosStructure() {
   membros.forEach(m => {
@@ -55,6 +58,25 @@ function gameOptionsHtml(selected) {
   return html;
 }
 
+/* Mensagem breve confirmando qual "coluna" de jogo (Jogo 1, Jogo 2, ...)
+   acabou de ser votada, para dar confirmação imediata ao clicar. */
+let votoFeedbackTimer = null;
+
+function showVotoFeedback(idx) {
+  const el = document.getElementById("voto-feedback");
+  if (!el) return;
+  el.textContent = `Jogo ${idx + 1} votado com sucesso!`;
+  if (votoFeedbackTimer) clearTimeout(votoFeedbackTimer);
+  votoFeedbackTimer = setTimeout(() => { el.textContent = ""; }, 2500);
+}
+
+function clearVotoFeedback() {
+  const el = document.getElementById("voto-feedback");
+  if (!el) return;
+  if (votoFeedbackTimer) clearTimeout(votoFeedbackTimer);
+  el.textContent = "";
+}
+
 function render() {
   ensureVotosStructure();
 
@@ -78,11 +100,23 @@ function render() {
       votacao.votos[m][i] = sel.value;
       persist();
       renderResults();
+      if (sel.value) {
+        showVotoFeedback(i);
+      } else {
+        clearVotoFeedback();
+      }
     });
   });
 
-  document.getElementById("validar-btn").style.display = votacao.validado ? "none" : "";
-  document.getElementById("reiniciar-btn").style.display = votacao.validado ? "" : "none";
+  const votosAbertos = !votacao.validado;
+  const fechadaNaoConfirmada = !votosAbertos && !votacao.confirmado;
+  document.getElementById("fechar-votacao-btn").style.display = votosAbertos ? "" : "none";
+  document.getElementById("desbloquear-votos-btn").style.display = fechadaNaoConfirmada ? "" : "none";
+  document.getElementById("validar-btn").style.display = fechadaNaoConfirmada ? "" : "none";
+  /* "Reiniciar Votação" só aparece quando já há um vencedor único anunciado
+     (decidido em renderResults, que tem a informação do ranking); nos
+     outros casos fica escondido por omissão. */
+  document.getElementById("reiniciar-votacao-btn").style.display = "none";
   document.getElementById("validar-erro").textContent = "";
 
   renderResults();
@@ -99,10 +133,14 @@ function currentRanking() {
 function renderResults() {
   const list = document.getElementById("results-list");
   const winnerBox = document.getElementById("winner-box");
+  const winnerCard = document.getElementById("winner-card");
+  const reabrirBtn = document.getElementById("desbloquear-votos-btn");
+  const reiniciarBtn = document.getElementById("reiniciar-votacao-btn");
 
   if (!votacao.validado) {
-    list.innerHTML = `<li class="placeholder"><span>Os resultados aparecem depois de clicares em "Validar Votos".</span></li>`;
+    list.innerHTML = `<li class="placeholder"><span>Os resultados aparecem depois de clicares em "Fechar Votação".</span></li>`;
     winnerBox.innerHTML = "";
+    winnerCard.style.display = "none";
     return;
   }
 
@@ -111,29 +149,31 @@ function renderResults() {
     <li><span>${escapeHtml(jogo)}</span><span class="pill">${n} voto${n === 1 ? "" : "s"}</span></li>
   `).join("") || `<li class="placeholder"><span>Ainda sem votos.</span></li>`;
 
-  if (ranking.length === 0) {
+  if (ranking.length === 0 || !votacao.confirmado) {
+    /* O vencedor só é anunciado depois de os votos serem validados
+       ("Validar Votos"); fechar a votação só fecha a tabela e mostra a
+       contagem, sem ainda anunciar quem ganhou. */
     winnerBox.innerHTML = "";
+    winnerCard.style.display = "none";
     return;
   }
   const topCount = ranking[0][1];
   const topGames = ranking.filter(([, n]) => n === topCount);
   if (topGames.length > 1) {
-    winnerBox.innerHTML = `
-      <div class="winner-box tie">
-        Há empate!
-        <div style="margin-top:10px">
-          <button class="primary small" id="desbloquear-btn">Desbloquear Votos${UNLOCK_ICON}</button>
-        </div>
-      </div>
-    `;
-    document.getElementById("desbloquear-btn").addEventListener("click", () => {
-      votacao.validado = false;
-      persist();
-      render();
-    });
+    /* Empate: não há vencedor para anunciar, por isso mantém-se a opção
+       de reabrir a votação (sem apagar os votos) para se poder desempatar. */
+    winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação" para desempatar.</div>`;
+    reabrirBtn.style.display = "";
+    reiniciarBtn.style.display = "none";
   } else {
+    /* Há um vencedor único anunciado: reabrir deixa de fazer sentido (não
+       há nada para desempatar), por isso o botão passa a ser "Reiniciar
+       Votação", para começar uma nova ronda de raiz. */
     winnerBox.innerHTML = `<div class="winner-box">🏆 Jogo vencedor:<br><span class="winner-name">${escapeHtml(topGames[0][0])}</span></div>`;
+    reabrirBtn.style.display = "none";
+    reiniciarBtn.style.display = "";
   }
+  winnerCard.style.display = "";
 }
 
 function renderHistory() {
@@ -148,13 +188,31 @@ function renderHistory() {
   }).join("") || `<li class="placeholder"><span>Ainda sem histórico.</span></li>`;
 }
 
+document.getElementById("fechar-votacao-btn").addEventListener("click", () => {
+  if (!hasAnyVote()) {
+    document.getElementById("validar-erro").textContent = "Não há nenhum voto para fechar.";
+    return;
+  }
+  votacao.validado = true;
+  persist();
+  render();
+});
+
+document.getElementById("desbloquear-votos-btn").addEventListener("click", () => {
+  votacao.validado = false;
+  votacao.confirmado = false;
+  persist();
+  render();
+});
+
 document.getElementById("validar-btn").addEventListener("click", () => {
   if (!hasAnyVote()) {
     document.getElementById("validar-erro").textContent = "Não há nenhum voto para validar.";
     return;
   }
-  if (!confirm("Validar os votos? A tabela deixa de poder ser editada até reiniciares a votação.")) return;
+  if (!confirm("Validar os votos? A votação será finalizada. O jogo vencedor será anunciado!")) return;
   votacao.validado = true;
+  votacao.confirmado = true;
   persist();
 
   const ranking = currentRanking();
@@ -176,9 +234,10 @@ document.getElementById("validar-btn").addEventListener("click", () => {
   renderHistory();
 });
 
-document.getElementById("reiniciar-btn").addEventListener("click", () => {
-  if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável.")) return;
+document.getElementById("reiniciar-votacao-btn").addEventListener("click", () => {
+  if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável para uma nova ronda.")) return;
   votacao.validado = false;
+  votacao.confirmado = false;
   Object.keys(votacao.votos).forEach(m => {
     votacao.votos[m] = votacao.votos[m].map(() => "");
   });

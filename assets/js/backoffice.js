@@ -14,6 +14,8 @@ document.getElementById("empty-nao-jogados-btn").innerHTML = `Esvaziar Jogos ain
 document.getElementById("save-password-btn").innerHTML = `Guardar nova password${SAVE_ICON}`;
 document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
+document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
+document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
 
 /* ---- Sincronização com a nuvem ---- */
 document.getElementById("sync-push-btn").addEventListener("click", () => {
@@ -322,4 +324,59 @@ document.getElementById("export-all-btn").addEventListener("click", () => {
   downloadJson("votacao.json", loadStore("votacaoSemanal"));
   downloadJson("historico-vencedores.json", loadStore("historicoVencedores"));
   downloadJson("dia-semana-jogo.json", loadStore("diaSemanaJogo"));
+});
+
+/* ---- Cópia de Segurança (Backup) ----
+   Ao contrário do "Exportar tudo" acima (pensado para atualizar os
+   ficheiros de assets/data/), isto guarda TUDO num único ficheiro,
+   pronto a voltar a carregar no site com "Importar Backup" caso alguma
+   vez seja preciso repor os dados (ex.: um problema na sincronização, ou
+   querer voltar atrás depois de um teste). Usa exatamente as mesmas
+   listas que estão sincronizadas com a nuvem (CLOUD_SYNC_KEYS). */
+document.getElementById("export-backup-btn").addEventListener("click", () => {
+  const backup = {};
+  CLOUD_SYNC_KEYS.forEach(key => { backup[key] = loadStore(key); });
+  const dataLabel = new Date().toISOString().slice(0, 10);
+  downloadJson(`jogos-amigos-backup-${dataLabel}.json`, backup);
+});
+
+document.getElementById("import-backup-btn").addEventListener("click", () => {
+  document.getElementById("import-backup-input").click();
+});
+
+document.getElementById("import-backup-input").addEventListener("change", () => {
+  const input = document.getElementById("import-backup-input");
+  const msg = document.getElementById("backup-msg");
+  const file = input.files[0];
+  if (!file) return;
+
+  if (!confirm("Importar este ficheiro? Isto substitui os dados atuais (neste browser e, se a sincronização estiver ativa, também para todos os membros) pelos dados guardados no ficheiro.")) {
+    input.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    let dados;
+    try {
+      dados = JSON.parse(e.target.result);
+    } catch (err) {
+      msg.textContent = "Não foi possível ler este ficheiro. Confirma que é um backup exportado por este site.";
+      input.value = "";
+      return;
+    }
+
+    const chavesEncontradas = CLOUD_SYNC_KEYS.filter(key => Object.prototype.hasOwnProperty.call(dados, key));
+    if (chavesEncontradas.length === 0) {
+      msg.textContent = "Este ficheiro não tem dados reconhecidos. Confirma que é um backup exportado por este site.";
+      input.value = "";
+      return;
+    }
+
+    chavesEncontradas.forEach(key => saveStore(key, dados[key]));
+    msg.textContent = `Backup importado (${chavesEncontradas.length} listas). A recarregar a página...`;
+    input.value = "";
+    setTimeout(() => window.location.reload(), 1200);
+  };
+  reader.readAsText(file);
 });
