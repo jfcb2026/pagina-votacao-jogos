@@ -6,6 +6,7 @@ let jogosNaoJogados = loadStore("jogosNaoJogados");
 let votacao = loadStore("votacaoSemanal");
 if (typeof votacao.validado !== "boolean") votacao.validado = false;
 if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
+if (typeof votacao.vencedorSorteado === "undefined") votacao.vencedorSorteado = null;
 
 (function renderDiaJogoLabel() {
   const dataLabel = nextGameDateLabel(loadStore("diaSemanaJogo"));
@@ -18,6 +19,7 @@ document.getElementById("fechar-votacao-btn").innerHTML = `Fechar Votação${LOC
 document.getElementById("desbloquear-votos-btn").innerHTML = `Reabrir Votação${UNLOCK_ICON}`;
 document.getElementById("validar-btn").innerHTML = `Validar Votos${CHECK_ICON}`;
 document.getElementById("reiniciar-votacao-btn").innerHTML = `Reiniciar Votação${REFRESH_ICON}`;
+document.getElementById("sortear-vencedor-btn").innerHTML = `Sortear Vencedor${DICE_ICON}`;
 
 function ensureVotosStructure() {
   membros.forEach(m => {
@@ -117,10 +119,10 @@ function render() {
   document.getElementById("fechar-votacao-btn").style.display = votosAbertos ? "" : "none";
   document.getElementById("desbloquear-votos-btn").style.display = fechadaNaoConfirmada ? "" : "none";
   document.getElementById("validar-btn").style.display = fechadaNaoConfirmada ? "" : "none";
-  /* "Reiniciar Votação" só aparece quando já há um vencedor único anunciado
-     (decidido em renderResults, que tem a informação do ranking); nos
-     outros casos fica escondido por omissão. */
+  /* "Reiniciar Votação" e "Sortear Vencedor" são geridos em renderResults,
+     que tem a informação do ranking; por omissão ficam escondidos. */
   document.getElementById("reiniciar-votacao-btn").style.display = "none";
+  document.getElementById("sortear-vencedor-btn").style.display = "none";
   document.getElementById("validar-erro").textContent = "";
 
   renderResults();
@@ -140,11 +142,13 @@ function renderResults() {
   const winnerCard = document.getElementById("winner-card");
   const reabrirBtn = document.getElementById("desbloquear-votos-btn");
   const reiniciarBtn = document.getElementById("reiniciar-votacao-btn");
+  const sortearBtn = document.getElementById("sortear-vencedor-btn");
 
   if (!votacao.validado) {
     list.innerHTML = `<li class="placeholder"><span>Os resultados aparecem depois de clicares em "Fechar Votação".</span></li>`;
     winnerBox.innerHTML = "";
     winnerCard.style.display = "none";
+    sortearBtn.style.display = "none";
     return;
   }
 
@@ -159,16 +163,28 @@ function renderResults() {
        contagem, sem ainda anunciar quem ganhou. */
     winnerBox.innerHTML = "";
     winnerCard.style.display = "none";
+    sortearBtn.style.display = "none";
     return;
   }
+
   const topCount = ranking[0][1];
   const topGames = ranking.filter(([, n]) => n === topCount);
-  if (topGames.length > 1) {
+
+  if (votacao.vencedorSorteado) {
+    /* Empate resolvido por sorteio: mostra o jogo sorteado em vez do
+       empate "cru" (que, em termos de contagem de votos, continua igual). */
+    winnerBox.innerHTML = `<div class="winner-box">🎲 Jogo vencedor (sorteado):<br><span class="winner-name">${escapeHtml(votacao.vencedorSorteado)}</span></div>`;
+    reabrirBtn.style.display = "none";
+    reiniciarBtn.style.display = "";
+    sortearBtn.style.display = "none";
+  } else if (topGames.length > 1) {
     /* Empate: não há vencedor para anunciar, por isso mantém-se a opção
-       de reabrir a votação (sem apagar os votos) para se poder desempatar. */
-    winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação" para desempatar.</div>`;
+       de reabrir a votação (sem apagar os votos) para se poder desempatar,
+       ou sortear o vencedor entre os jogos empatados. */
+    winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação" para desempatar, ou "Sortear Vencedor" para decidir ao acaso.</div>`;
     reabrirBtn.style.display = "";
     reiniciarBtn.style.display = "none";
+    sortearBtn.style.display = "";
   } else {
     /* Há um vencedor único anunciado: reabrir deixa de fazer sentido (não
        há nada para desempatar), por isso o botão passa a ser "Reiniciar
@@ -176,6 +192,7 @@ function renderResults() {
     winnerBox.innerHTML = `<div class="winner-box">🏆 Jogo vencedor:<br><span class="winner-name">${escapeHtml(topGames[0][0])}</span></div>`;
     reabrirBtn.style.display = "none";
     reiniciarBtn.style.display = "";
+    sortearBtn.style.display = "none";
   }
   winnerCard.style.display = "";
 }
@@ -187,7 +204,7 @@ function renderHistory() {
   const ordenado = [...historico].reverse().filter(entry => !entry.empate);
   list.innerHTML = ordenado.map(entry => {
     const dataLabel = entry.dataJogoLabel || "";
-    const nome = `🏆 ${escapeHtml(entry.vencedor)}`;
+    const nome = `${entry.sorteio ? "🎲" : "🏆"} ${escapeHtml(entry.vencedor)}`;
     return `<li><span class="historico-jogo">${nome}</span> <span class="historico-data">— ${dataLabel}</span></li>`;
   }).join("") || `<li class="placeholder"><span>Ainda sem histórico.</span></li>`;
 }
@@ -205,6 +222,7 @@ document.getElementById("fechar-votacao-btn").addEventListener("click", () => {
 document.getElementById("desbloquear-votos-btn").addEventListener("click", () => {
   votacao.validado = false;
   votacao.confirmado = false;
+  votacao.vencedorSorteado = null;
   persist();
   render();
 });
@@ -238,10 +256,41 @@ document.getElementById("validar-btn").addEventListener("click", () => {
   renderHistory();
 });
 
+document.getElementById("sortear-vencedor-btn").addEventListener("click", () => {
+  const ranking = currentRanking();
+  if (!ranking.length) return;
+  const topCount = ranking[0][1];
+  const topGames = ranking.filter(([, n]) => n === topCount);
+  if (topGames.length < 2) return;
+
+  const nomes = topGames.map(([jogo]) => jogo);
+  if (!confirm(`Sortear o jogo vencedor entre os jogos empatados (${nomes.join(", ")})?`)) return;
+
+  const escolhido = nomes[Math.floor(Math.random() * nomes.length)];
+  votacao.vencedorSorteado = escolhido;
+  votacao.confirmado = true;
+  persist();
+
+  const historico = loadStore("historicoVencedores");
+  historico.push({
+    data: new Date().toISOString(),
+    dataJogoLabel: nextGameDateLabel(loadStore("diaSemanaJogo")),
+    empate: false,
+    sorteio: true,
+    vencedor: escolhido,
+    ranking: ranking.map(([jogo, votos]) => ({ jogo, votos })),
+  });
+  saveStore("historicoVencedores", historico);
+
+  render();
+  renderHistory();
+});
+
 document.getElementById("reiniciar-votacao-btn").addEventListener("click", () => {
   if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável para uma nova ronda.")) return;
   votacao.validado = false;
   votacao.confirmado = false;
+  votacao.vencedorSorteado = null;
   Object.keys(votacao.votos).forEach(m => {
     votacao.votos[m] = votacao.votos[m].map(() => "");
   });

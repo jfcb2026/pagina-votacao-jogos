@@ -358,6 +358,17 @@ button.danger {
 }
 button.danger:hover { filter: brightness(0.9); border-color: var(--bad); }
 
+/* Botão "Sortear Vencedor" a dourado/amarelo, para se distinguir das
+   outras ações da Votação Semanal */
+#sortear-vencedor-btn.primary {
+  background: linear-gradient(rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.22)), #d4a72c;
+  border-color: #d4a72c;
+  color: #fff;
+}
+#sortear-vencedor-btn.primary:hover {
+  background: linear-gradient(rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.34)), #d4a72c;
+}
+
 /* Botão "Migrar p/ Habituais" preenchido com a cor de destaque do tema,
    para se distinguir do Remover em todas as tabelas onde aparece */
 button.migrate-btn {
