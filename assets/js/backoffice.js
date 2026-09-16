@@ -16,6 +16,7 @@ document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
 document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
 document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
+document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloqueio da Votação${UNLOCK_ICON}`;
 
 /* ---- Sincronização com a nuvem ---- */
 document.getElementById("sync-push-btn").addEventListener("click", () => {
@@ -192,6 +193,16 @@ document.getElementById("remove-slot-btn").addEventListener("click", () => {
 });
 
 renderSlots();
+
+/* ---- Votação Semanal — Desbloquear Votação (botão de segurança) ---- */
+document.getElementById("force-unlock-votacao-btn").addEventListener("click", () => {
+  if (!confirm("Forçar o desbloqueio da votação atual? A tabela volta a ficar editável e o vencedor deixa de estar anunciado. Os votos dados até agora são mantidos.")) return;
+  votacao.validado = false;
+  votacao.confirmado = false;
+  saveStore("votacaoSemanal", votacao);
+  renderSlots();
+  document.getElementById("force-unlock-msg").textContent = "Votação desbloqueada.";
+});
 
 /* ---- Histórico de Vencedores ---- */
 document.getElementById("clear-historico-btn").addEventListener("click", () => {
