@@ -47,31 +47,78 @@ try {
     return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
-  function storedOverrideRaw() {
-    try {
-      const raw = localStorage.getItem("jogosAmigos_passwordOverride");
-      if (raw !== null) {
-        const override = JSON.parse(raw);
-        if (override) return override;
-      }
-    } catch (e) { /* sem acesso a localStorage: segue para a password por defeito */ }
-    return null;
-  }
-
   const input = document.getElementById("password-input");
   const error = document.getElementById("login-error");
+  const loginBtn = document.getElementById("login-btn");
+  const loginBtnLabel = loginBtn.innerHTML;
+
+  function setLoading(ligado) {
+    loginBtn.disabled = ligado;
+    loginBtn.innerHTML = ligado ? '<span class="spinner"></span>' : loginBtnLabel;
+  }
 
   function doLogin() {
     try { sessionStorage.setItem("jogosAmigos_auth", "ok"); } catch (e) { /* ignora */ }
     window.location.href = redirectDestination();
   }
 
-  async function tryLogin() {
-    const stored = storedOverrideRaw();
-    const defaultPassword = "alterar123";
+  function esperarFirebasePronto(timeoutMs) {
+    return new Promise(resolve => {
+      const inicio = Date.now();
+      function verificar() {
+        if (typeof firebase !== "undefined" && firebase.apps && firebase.apps.length) {
+          const auth = firebase.auth();
+          if (auth.currentUser) { resolve(true); return; }
+          let resolvido = false;
+          const unsubscribe = auth.onAuthStateChanged(user => {
+            if (resolvido || !user) return;
+            resolvido = true;
+            unsubscribe();
+            resolve(true);
+          });
+          setTimeout(() => {
+            if (resolvido) return;
+            resolvido = true;
+            unsubscribe();
+            resolve(false);
+          }, Math.max(timeoutMs - (Date.now() - inicio), 0));
+          return;
+        }
+        if (Date.now() - inicio >= timeoutMs) { resolve(false); return; }
+        setTimeout(verificar, 150);
+      }
+      verificar();
+    });
+  }
 
+  async function buscarHashGuardado() {
+    const pronto = await esperarFirebasePronto(15000);
+    if (!pronto) return { ok: false, valor: null };
     try {
+      const doc = await firebase.firestore().collection("jogosAmigos").doc("passwordOverride").get();
+      const valor = doc.exists && doc.data().value ? doc.data().value : null;
+      return { ok: true, valor };
+    } catch (e) {
+      return { ok: false, valor: null };
+    }
+  }
+
+  async function tryLogin() {
+    error.textContent = "";
+    setLoading(true);
+    try {
+      const defaultPassword = "alterar123";
       const digest = await sha256Hex(input.value);
+      const resultado = await buscarHashGuardado();
+      const stored = resultado.valor;
+
+      if (!resultado.ok) {
+        const esperado = await sha256Hex(defaultPassword);
+        if (digest === esperado) { doLogin(); return; }
+        error.textContent = "Sem ligação para verificar a password. Tenta novamente.";
+        return;
+      }
+
       const esperado = stored !== null ? stored : await sha256Hex(defaultPassword);
       if (digest === esperado) { doLogin(); return; }
 
@@ -80,32 +127,18 @@ try {
         doLogin();
         return;
       }
-    } catch (e) {
-      if (input.value === (stored !== null ? stored : defaultPassword)) { doLogin(); return; }
-    }
 
-    error.textContent = "Password incorreta.";
+      error.textContent = "Password incorreta.";
+    } catch (e) {
+      error.textContent = "Password incorreta.";
+    } finally {
+      setLoading(false);
+      try { localStorage.removeItem("jogosAmigos_passwordOverride"); } catch (e) { /* ignora */ }
+    }
   }
 
-  document.getElementById("login-btn").addEventListener("click", tryLogin);
+  loginBtn.addEventListener("click", tryLogin);
   input.addEventListener("keydown", e => { if (e.key === "Enter") tryLogin(); });
-
-  /* Na primeiríssima visita a este browser (nada em cache, nada
-     sincronizado ainda), a password definida no Backoffice pode ainda não
-     ter chegado a tempo do utilizador tentar entrar — só fica disponível
-     depois de a página terminar de carregar tudo (Firebase, etc.) e a
-     sincronização com a nuvem correr em segundo plano. Como isso resolve-se
-     sempre com um simples refresh, faz-se aqui um único refresh automático
-     e silencioso assim que a página (e tudo o que ela carrega) estiver
-     pronta — só uma vez por sessão de browser, para não entrar em ciclo. */
-  try {
-    if (!sessionStorage.getItem("jogosAmigos_autoReload")) {
-      sessionStorage.setItem("jogosAmigos_autoReload", "1");
-      window.addEventListener("load", () => {
-        window.location.reload();
-      });
-    }
-  } catch (e) { /* sem sessionStorage: sem refresh automático, mas o site continua a funcionar */ }
 } catch (e) {
   document.getElementById("login-error").textContent =
     "Não foi possível carregar o site neste browser. Verifica se os cookies/dados do site estão permitidos (não estás em navegação privada com bloqueio total) e tenta novamente.";
@@ -117,7 +150,7 @@ try {
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=12"></script>
+<script src="assets/js/common.js?v=13"></script>
 <script>
 /* Depois de tudo carregado, só atualiza o título com o nome do site
    (personalizável no Backoffice) — isto é apenas estético e nunca deve

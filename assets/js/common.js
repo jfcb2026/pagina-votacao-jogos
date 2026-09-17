@@ -260,11 +260,10 @@ function initCloudSync() {
     if (typeof firebase === "undefined") return;
     if (!firebase.apps || !firebase.apps.length) return; // sem firebase-config.js, nenhuma app inicializada
     const autenticado = isAuthenticated();
-    const keys = autenticado ? CLOUD_SYNC_KEYS : ["passwordOverride"];
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return;
       _cloudReady = true;
-      keys.forEach(watchCloudKey);
+      if (autenticado) CLOUD_SYNC_KEYS.forEach(watchCloudKey);
     });
     firebase.auth().signInAnonymously().catch(() => { /* sem sincronização, fica só local */ });
 
