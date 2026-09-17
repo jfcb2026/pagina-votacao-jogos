@@ -41,13 +41,6 @@ try {
     window.location.href = redirectDestination();
   }
 
-  /* A password deixou de ficar guardada em texto simples no localStorage
-     (visível em DevTools > Application). Agora só se guarda o hash
-     SHA-256 e é esse hash que se compara ao que a pessoa escreve — quem
-     inspecionar o armazenamento do browser só vê o hash, não a password
-     real. Isto não é uma proteção contra um atacante muito determinado
-     (o site continua a correr todo no browser, sem servidor), mas evita
-     que a password fique à vista de qualquer pessoa que abra o DevTools. */
   async function sha256Hex(texto) {
     const bytes = new TextEncoder().encode(texto);
     const buffer = await crypto.subtle.digest("SHA-256", bytes);
@@ -82,17 +75,12 @@ try {
       const esperado = stored !== null ? stored : await sha256Hex(defaultPassword);
       if (digest === esperado) { doLogin(); return; }
 
-      /* Compatibilidade com passwords guardadas antes desta alteração
-         (ainda em texto simples): se corresponder, entra normalmente —
-         mas o Backoffice deve gravar a password de novo (secção
-         "Password de Acesso") para passar a ficar guardada como hash
-         também para os restantes membros. */
-      const legadoTextoSimples = stored !== null ? stored : defaultPassword;
-      if (input.value === legadoTextoSimples) { doLogin(); return; }
+      const pareceHash = v => /^[0-9a-f]{64}$/i.test(v);
+      if (stored !== null && !pareceHash(stored) && input.value === stored) {
+        doLogin();
+        return;
+      }
     } catch (e) {
-      /* Sem suporte a crypto.subtle neste contexto (browser antigo ou
-         página aberta fora de https/localhost): recua para a comparação
-         direta, tal como funcionava antes. */
       if (input.value === (stored !== null ? stored : defaultPassword)) { doLogin(); return; }
     }
 
@@ -129,7 +117,7 @@ try {
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=8"></script>
+<script src="assets/js/common.js?v=9"></script>
 <script>
 /* Depois de tudo carregado, só atualiza o título com o nome do site
    (personalizável no Backoffice) — isto é apenas estético e nunca deve
