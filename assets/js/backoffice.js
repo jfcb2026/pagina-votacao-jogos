@@ -37,6 +37,34 @@ document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloq
 document.getElementById("clear-votacao-atual-btn").innerHTML = `Limpar Votação Atual${TRASH_ICON}`;
 
 /* ---- Sincronização com a nuvem ---- */
+function atualizarEstadoLigacao() {
+  const dot = document.getElementById("sync-status-dot");
+  const label = document.getElementById("sync-status-label");
+  if (!dot || !label) return;
+
+  if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
+    dot.className = "status-dot status-dot-red";
+    label.textContent = "Sincronização não configurada neste site";
+    return;
+  }
+  if (!navigator.onLine) {
+    dot.className = "status-dot status-dot-red";
+    label.textContent = "Sem ligação à internet";
+    return;
+  }
+  if (_cloudReady) {
+    dot.className = "status-dot status-dot-green";
+    label.textContent = "Ligado à nuvem";
+    return;
+  }
+  dot.className = "status-dot status-dot-orange";
+  label.textContent = "A ligar à nuvem...";
+}
+atualizarEstadoLigacao();
+setInterval(atualizarEstadoLigacao, 2000);
+window.addEventListener("online", atualizarEstadoLigacao);
+window.addEventListener("offline", atualizarEstadoLigacao);
+
 document.getElementById("sync-push-btn").addEventListener("click", () => {
   const msg = document.getElementById("sync-msg");
   if (typeof firebase === "undefined") {

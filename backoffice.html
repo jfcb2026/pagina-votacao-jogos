@@ -162,6 +162,7 @@
 
     <div class="backoffice-section">
       <h2>Sincronização entre Membros (nuvem)</h2>
+      <p class="sync-status"><span class="sync-status-prefix">Estado da Ligação: </span><span class="status-dot" id="sync-status-dot"></span><span id="sync-status-label">A verificar...</span></p>
       <p class="hint">Todas as alterações feitas no site (votos, jogos, eventos, etc.) já são enviadas automaticamente para a nuvem, não precisas de carregar neste botão no dia a dia. Só é preciso usá-lo em dois casos: (1) uma única vez, se este browser já tinha dados próprios guardados antes de a sincronização ficar ativa, para os enviar para a nuvem; ou (2) se achares que a sincronização falhou e queres forçar o reenvio dos dados atuais deste browser para a nuvem.</p>
       <div class="actions-row">
         <button class="primary" id="sync-push-btn">Enviar dados deste browser para a nuvem</button>
@@ -194,6 +195,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/common.js?v=13"></script>
-<script src="assets/js/backoffice.js?v=4"></script>
+<script src="assets/js/backoffice.js?v=5"></script>
 </body>
 </html>

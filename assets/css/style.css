@@ -817,3 +817,27 @@ table input[type="text"], table input[type="date"], table select, table textarea
   to { transform: rotate(360deg); }
 }
 
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0 10px;
+  font-size: 0.9em;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #999;
+  flex-shrink: 0;
+}
+
+.status-dot-green { background: #2ecc71; }
+.status-dot-orange { background: #f39c12; }
+.status-dot-red { background: #e74c3c; }
+
+.sync-status-prefix { color: var(--text-dim); }
+
