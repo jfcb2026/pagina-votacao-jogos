@@ -6,10 +6,6 @@ let colunas = loadStore("colunasEventos");
 
 function persist() { saveStore("eventos", eventos); }
 
-/* Garante que a coluna "Descrição" existe e está corretamente configurada
-   (campo de texto simples, não removível). Não mexe em mais nenhuma coluna
-   — colunas com id "tipo" ou "data" já não são tratadas como legado, podem
-   agora ser criadas livremente no Backoffice. */
 (function garantirColunaDescricao() {
   let mudou = false;
   const descricao = colunas.find(c => c.id === "descricao");

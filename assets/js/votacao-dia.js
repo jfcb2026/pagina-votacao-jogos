@@ -7,7 +7,6 @@ if (typeof votacaoDia.aplicado !== "boolean") votacaoDia.aplicado = false;
 
 const DIAS = ["2f", "3f", "4f", "5f", "6f"];
 const DIAS_LABEL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
-/* Índice correspondente em WEEKDAY_NAMES / diaSemanaJogo (0 = Domingo). */
 const DIAS_WEEKDAY_INDEX = [1, 2, 3, 4, 5];
 
 function ensureVotoStructure() {
@@ -91,9 +90,6 @@ function renderTotals() {
     totals.map(n => `<td class="text-center dia-total${n === max && max > 0 ? " dia-total-max" : ""}">${n}</td>`).join("");
 }
 
-/* Botão para limpar só os votos (mantém o dia já aplicado no Backoffice)
-   e começar uma nova ronda de votação. Só aparece depois de "Aplicar como
-   Dia da Semana" ter sido usado. */
 function reiniciarVotacaoDia() {
   if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável para uma nova ronda.")) return;
   Object.keys(votacaoDia.voto).forEach(m => {
@@ -118,10 +114,6 @@ function ligarBotaoReiniciar() {
   if (btn) btn.addEventListener("click", reiniciarVotacaoDia);
 }
 
-/* Mostra qual o dia com mais votos e permite aplicá-lo como "Dia de Jogo"
-   (usado na Votação do Jogo Semanal para calcular a próxima sessão). Em
-   caso de empate, deixa escolher qual dos dias empatados aplicar. Depois
-   de aplicado, passa a mostrar também o botão de Reiniciar Votação. */
 function renderResultadoDia() {
   const totals = computeTotals();
   const max = Math.max(...totals, 0);

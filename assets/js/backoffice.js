@@ -14,9 +14,6 @@ document.getElementById("empty-nao-jogados-btn").innerHTML = `Esvaziar Jogos ain
 document.getElementById("empty-links-btn").innerHTML = `Esvaziar Links${TRASH_ICON}`;
 document.getElementById("save-password-btn").innerHTML = `Guardar Alterações${SAVE_ICON}`;
 
-/* Os campos de password ficam com a mesma largura do botão "Guardar
-   Alterações" (que varia com o texto/ícone), em vez de ocuparem a
-   largura toda do form. */
 function syncPasswordFieldWidths() {
   const btn = document.getElementById("save-password-btn");
   const w = btn.getBoundingClientRect().width;
@@ -46,7 +43,6 @@ document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPOR
 document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloqueio da Votação${UNLOCK_ICON}`;
 document.getElementById("clear-votacao-atual-btn").innerHTML = `Limpar Votação Atual${TRASH_ICON}`;
 
-/* ---- Sincronização com a Nuvem ---- */
 function atualizarEstadoLigacao() {
   const dot = document.getElementById("sync-status-dot");
   const label = document.getElementById("sync-status-label");
@@ -111,7 +107,6 @@ document.getElementById("sync-toggle-btn").addEventListener("click", () => {
   atualizarEstadoLigacao();
 });
 
-/* ---- Nome do Site ---- */
 document.getElementById("site-name-input").value = loadStore("nomeSite");
 document.getElementById("save-site-name-btn").addEventListener("click", () => {
   const val = document.getElementById("site-name-input").value.trim();
@@ -120,7 +115,6 @@ document.getElementById("save-site-name-btn").addEventListener("click", () => {
   document.getElementById("site-name-msg").textContent = "Nome atualizado.";
 });
 
-/* ---- Tema de Cores ---- */
 function renderThemes() {
   const activo = getActiveTheme();
   const wrap = document.getElementById("theme-groups");
@@ -155,7 +149,6 @@ function renderThemes() {
 
 renderThemes();
 
-/* ---- Password ---- */
 document.getElementById("save-password-btn").addEventListener("click", async () => {
   const oldInput = document.getElementById("old-password");
   const newInput = document.getElementById("new-password");
@@ -176,7 +169,6 @@ document.getElementById("save-password-btn").addEventListener("click", async () 
   msg.textContent = "Password atualizada.";
 });
 
-/* ---- Membros ---- */
 let membros = loadStore("membros");
 
 function renderMembers() {
@@ -228,7 +220,6 @@ document.getElementById("add-member-btn").addEventListener("click", () => {
 
 renderMembers();
 
-/* ---- Votação Semanal — Dia de Jogo ---- */
 let diaSemanaJogo = loadStore("diaSemanaJogo");
 
 function renderDiaJogo() {
@@ -243,7 +234,6 @@ document.getElementById("dia-jogo-select").addEventListener("change", e => {
 
 renderDiaJogo();
 
-/* ---- Votação do Dia de Jogo — Horário ---- */
 document.getElementById("horario-jogo-input").value = loadStore("horarioJogo");
 document.getElementById("save-horario-jogo-btn").addEventListener("click", () => {
   const val = document.getElementById("horario-jogo-input").value.trim();
@@ -252,7 +242,6 @@ document.getElementById("save-horario-jogo-btn").addEventListener("click", () =>
   document.getElementById("horario-jogo-msg").textContent = "Horário atualizado.";
 });
 
-/* ---- Votação Semanal — Slots de Jogo ---- */
 let votacao = loadStore("votacaoSemanal");
 
 function renderSlots() {
@@ -293,7 +282,6 @@ document.getElementById("remove-slot-btn").addEventListener("click", () => {
 
 renderSlots();
 
-/* ---- Votação Semanal — Desbloquear Votação (botão de segurança) ---- */
 document.getElementById("force-unlock-votacao-btn").addEventListener("click", () => {
   if (!confirm("Forçar o desbloqueio da votação atual? A tabela volta a ficar editável e o vencedor deixa de estar anunciado. Os votos dados até agora são mantidos.")) return;
   votacao.validado = false;
@@ -315,7 +303,6 @@ document.getElementById("clear-votacao-atual-btn").addEventListener("click", () 
   document.getElementById("clear-votacao-atual-msg").textContent = "Votação atual limpa.";
 });
 
-/* ---- Histórico de Vencedores ---- */
 document.getElementById("clear-historico-btn").addEventListener("click", () => {
   if (!confirm("Limpar o histórico de jogos vencedores e a votação atual (votos e validação)? Esta ação não pode ser desfeita.")) return;
   emptyStore("historicoVencedores", []);
@@ -330,7 +317,6 @@ document.getElementById("clear-historico-btn").addEventListener("click", () => {
   alert("Histórico de vencedores e votação atual limpos.");
 });
 
-/* ---- Wishlist ---- */
 document.getElementById("clear-reactions-btn").addEventListener("click", () => {
   if (!confirm("Limpar todas as reações (Likes/Dislikes) da Wishlist?")) return;
   const wishlist = loadStore("wishlist");
@@ -345,7 +331,6 @@ document.getElementById("empty-wishlist-btn").addEventListener("click", () => {
   alert("Wishlist esvaziada.");
 });
 
-/* ---- Esvaziar listas de jogos ---- */
 document.getElementById("empty-habituais-btn").addEventListener("click", () => {
   if (!confirm("Esvaziar por completo a lista de Jogos Habituais? Esta ação não pode ser desfeita.")) return;
   emptyStore("jogosHabituais", []);
@@ -364,7 +349,6 @@ document.getElementById("empty-links-btn").addEventListener("click", () => {
   alert("Links esvaziados.");
 });
 
-/* ---- Colunas das tabelas de jogos ---- */
 function initColumnManager(storageName, listElId, inputElId, addBtnId) {
   let colunas = loadStore(storageName);
 
@@ -443,13 +427,6 @@ initColumnManager("colunasWishlist", "cols-wishlist", "new-col-wishlist", "add-c
 initColumnManager("colunasEventos", "cols-eventos", "new-col-eventos", "add-col-eventos-btn");
 initColumnManager("colunasLinks", "cols-links", "new-col-links", "add-col-links-btn");
 
-/* ---- Cópia de Segurança (Backup) ----
-   Ao contrário do "Exportar tudo" acima (pensado para atualizar os
-   ficheiros de assets/data/), isto guarda TUDO num único ficheiro,
-   pronto a voltar a carregar no site com "Importar Backup" caso alguma
-   vez seja preciso repor os dados (ex.: um problema na sincronização, ou
-   querer voltar atrás depois de um teste). Usa exatamente as mesmas
-   listas que estão sincronizadas com a nuvem (CLOUD_SYNC_KEYS). */
 document.getElementById("export-backup-btn").addEventListener("click", () => {
   const backup = {};
   CLOUD_SYNC_KEYS.forEach(key => { backup[key] = loadStore(key); });

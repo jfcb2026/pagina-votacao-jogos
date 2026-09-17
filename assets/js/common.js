@@ -1,8 +1,4 @@
-/* common.js — dados partilhados, autenticação, navegação e utilitários,
-   usados em todas as páginas do site. */
 
-/* Ícones do menu principal (definidos aqui em cima para poderem ser usados
-   já em NAV_ITEMS, mais abaixo) */
 const NAV_ICON_VOTACAO = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"></rect><polyline points="8 12 11 15 16 9"></polyline></svg>';
 const NAV_ICON_HABITUAIS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>';
 const NAV_ICON_NAO_JOGADOS = '<svg class="nav-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
@@ -21,9 +17,6 @@ const NAV_ITEMS = [
   { href: "passeios.html", label: "Passeios", icon: NAV_ICON_EVENTOS },
 ];
 
-/* ---------- Dados de exemplo (seed inicial), usados só se ainda não
-   existir nada guardado no browser. Espelham o que vai para os
-   ficheiros JSON em assets/data/ quando a lista for exportada. ---------- */
 const DEFAULT_DATA = {
   membros: [
     "Membro 1", "Membro 2", "Membro 3", "Membro 4",
@@ -88,14 +81,10 @@ const DEFAULT_DATA = {
   historicoVencedores: [],
   votacaoDia: { voto: {}, aplicado: false },
   horarioJogo: "21h",
-  diaSemanaJogo: 4, // 0 = Domingo ... 4 = Quinta-Feira
+  diaSemanaJogo: 4,
   tema: "midnight",
   nomeSite: "Página De Jogos De Amigos",
 };
-
-/* ---------- Temas de cores ---------- */
-/* "midnight" é o tema padrão (o que já existia); os restantes ficam
-   disponíveis no Backoffice, em "Tema de Cores". */
 
 const THEME_GROUPS = [
   { id: "escuro", label: "Tons Escuros" },
@@ -128,8 +117,6 @@ function applyTheme(themeId) {
 
 applyTheme();
 
-/* ---------- Dia de jogo (dia da semana) ---------- */
-
 const WEEKDAY_NAMES = [
   "Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira",
   "Quinta-Feira", "Sexta-Feira", "Sábado",
@@ -152,26 +139,15 @@ function nextGameDateLabel(diaSemana, fromDate) {
   return `${WEEKDAY_NAMES[d.getDay()]}, ${formatDatePT(d)}`;
 }
 
-/* ---------- Armazenamento local (localStorage) ---------- */
-/* Cada "store" fica cacheado no browser. No Backoffice há um botão para
-   exportar tudo para ficheiros JSON, prontos a colocar em assets/data/
-   e a serem enviados (commit) para o repositório do GitHub. */
-
 function storageKey(name) { return "jogosAmigos_" + name; }
 
-/* Alguns browsers (ex.: Safari com "Bloquear todos os cookies" ativo, ou
-   navegação privada muito restritiva) recusam o acesso ao localStorage e
-   isso lança um erro. Em vez de a página inteira deixar de funcionar
-   nesse caso, usa-se este objeto em memória como rede de segurança: os
-   dados não ficam guardados entre visitas, mas o site continua a
-   funcionar durante a sessão. */
 const _memoryStore = {};
 
 function loadStore(name) {
   try {
     const raw = localStorage.getItem(storageKey(name));
     if (raw !== null) {
-      try { return JSON.parse(raw); } catch (e) { /* segue para o default */ }
+      try { return JSON.parse(raw); } catch (e) { }
     }
   } catch (e) {
     if (name in _memoryStore) return _memoryStore[name];
@@ -198,15 +174,6 @@ function emptyStore(name, emptyValue) {
   saveStore(name, emptyValue);
 }
 
-/* ---------- Sincronização com a nuvem (Firebase Firestore) ---------- */
-/* Cada membro do grupo guarda os dados localmente (localStorage, como
-   antes), mas as listas abaixo passam também a ser escritas/lidas no
-   Firestore, para que uma alteração feita por um membro apareça
-   automaticamente no ecrã dos outros, sem recarregar a página. Se o
-   ficheiro assets/js/firebase-config.js não existir (ou a ligação
-   falhar), o site continua a funcionar apenas com o localStorage, tal
-   como antes desta funcionalidade existir. */
-
 const CLOUD_SYNC_KEYS = [
   "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos", "links",
   "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos", "colunasLinks",
@@ -216,12 +183,6 @@ const CLOUD_SYNC_KEYS = [
 
 let _cloudReady = false;
 
-/* Guarda, por lista, o instante da última escrita feita a partir deste
-   browser. Serve para reconhecer o "eco" dessa mesma escrita quando ela
-   volta pelo onSnapshot (que dispara sempre, mesmo para quem a fez) e
-   assim evitar voltar a desenhar o ecrã nesse caso — sem isto, cada
-   letra escrita num campo de texto disparava um re-render completo da
-   tabela e o campo perdia o foco a cada carácter. */
 const _lastPushedAt = {};
 
 function pushToCloud(name, data) {
@@ -231,11 +192,11 @@ function pushToCloud(name, data) {
   _lastPushedAt[name] = ts;
   firebase.firestore().collection("jogosAmigos").doc(name)
     .set({ value: data, updatedAt: ts })
-    .catch(() => { /* falha silenciosa: fica só localStorage até à próxima escrita */ });
+    .catch(() => { });
 }
 
 function refreshFromCloud() {
-  if (typeof render === "function") { try { render(); } catch (e) { /* página sem render() */ } }
+  if (typeof render === "function") { try { render(); } catch (e) { } }
 }
 
 const _cloudUnsubscribers = {};
@@ -244,101 +205,60 @@ function watchCloudKey(name) {
   _cloudUnsubscribers[name] = firebase.firestore().collection("jogosAmigos").doc(name).onSnapshot(snap => {
     if (!snap.exists) return;
     const remote = snap.data();
-    if (remote.updatedAt && remote.updatedAt === _lastPushedAt[name]) return; // eco da nossa própria escrita
+    if (remote.updatedAt && remote.updatedAt === _lastPushedAt[name]) return;
     localStorage.setItem(storageKey(name), JSON.stringify(remote.value));
     refreshFromCloud();
-  }, () => { /* sem permissão ou sem ligação: ignora, mantém o que está local */ });
+  }, () => { });
 }
 
-/* Permite interromper/retomar manualmente a sincronização com a Nuvem
-   neste browser (botão no Backoffice), por exemplo para trabalhar
-   temporariamente offline sem enviar/receber alterações. Guardado em
-   sessionStorage: aplica-se a esta sessão de navegação (todas as páginas
-   abertas na mesma aba), sem afetar os outros membros nem outras abas. */
 function isCloudSyncPaused() {
   try { return sessionStorage.getItem("jogosAmigos_cloudPaused") === "1"; } catch (e) { return false; }
 }
 
 function pauseCloudSync() {
   Object.keys(_cloudUnsubscribers).forEach(name => {
-    try { _cloudUnsubscribers[name](); } catch (e) { /* ignora */ }
+    try { _cloudUnsubscribers[name](); } catch (e) { }
   });
   _cloudReady = false;
-  try { sessionStorage.setItem("jogosAmigos_cloudPaused", "1"); } catch (e) { /* ignora */ }
+  try { sessionStorage.setItem("jogosAmigos_cloudPaused", "1"); } catch (e) { }
 }
 
 function resumeCloudSync() {
-  try { sessionStorage.removeItem("jogosAmigos_cloudPaused"); } catch (e) { /* ignora */ }
+  try { sessionStorage.removeItem("jogosAmigos_cloudPaused"); } catch (e) { }
   window.location.reload();
 }
 
 function initCloudSync() {
-  /* Se o Firebase não estiver disponível (SDK não carregado) ou não tiver
-     sido inicializado (falta assets/js/firebase-config.js, por exemplo
-     numa cópia do site sem esse ficheiro, que fica fora do repositório
-     por conter a configuração do projeto), o site tem de continuar a
-     funcionar normalmente em modo só-local, exatamente como antes desta
-     funcionalidade existir — daí o try/catch: um erro aqui nunca pode
-     impedir o resto deste ficheiro (cabeçalho, tabelas, etc.) de correr. */
   try {
     if (isCloudSyncPaused()) return;
     if (typeof firebase === "undefined") return;
-    if (!firebase.apps || !firebase.apps.length) return; // sem firebase-config.js, nenhuma app inicializada
+    if (!firebase.apps || !firebase.apps.length) return;
     const autenticado = isAuthenticated();
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return;
       _cloudReady = true;
       if (autenticado) CLOUD_SYNC_KEYS.forEach(watchCloudKey);
     });
-    firebase.auth().signInAnonymously().catch(() => { /* sem sincronização, fica só local */ });
+    firebase.auth().signInAnonymously().catch(() => { });
 
-    /* Numa página autenticada (já com o menu principal, tabelas, etc.),
-       as variáveis com os dados (membros, jogos, votos...) são lidas do
-       localStorage só uma vez, no arranque do script de cada página —
-       não se atualizam sozinhas quando o Firestore traz dados mais
-       recentes a meio da sessão (o "onSnapshot" atualiza o localStorage e
-       chama render(), mas render() continua a usar essas variáveis já
-       carregadas). Isto era mais raro de notar antes, porque a
-       sincronização já tinha corrido nalguma página anterior (por
-       exemplo o ecrã de login); agora que só começa a sincronizar tudo
-       depois de autenticado, é mais provável apanhar a primeira página
-       ainda com os dados de exemplo, até se dar um F5. Para evitar ter de
-       fazer isso manualmente, faz-se aqui o mesmo tipo de recarregamento
-       automático e silencioso, uma única vez por sessão de browser, que
-       já existia em index.html para a password. */
     try {
       if (autenticado && !sessionStorage.getItem("jogosAmigos_autoReloadDados")) {
         sessionStorage.setItem("jogosAmigos_autoReloadDados", "1");
-        /* Esconde o conteúdo principal (a tabela com os dados de exemplo
-           "Membro 1", "Membro 2", ...) enquanto se espera pelo
-           recarregamento automático, para quem está a ver o ecrã não
-           chegar a notar esses valores de exemplo. O cabeçalho/menu fica
-           visível na mesma, é só o <main> de cada página. */
         const main = document.querySelector("main");
         if (main) main.style.visibility = "hidden";
         window.addEventListener("load", () => {
           setTimeout(() => window.location.reload(), 900);
         });
       }
-    } catch (e) { /* sem sessionStorage: sem refresh automático, mas o site continua a funcionar */ }
-  } catch (e) { /* sem sincronização, fica só local */ }
+    } catch (e) { }
+  } catch (e) { }
 }
 
-/* Envia para o Firestore o valor atual (guardado localmente) de todas as
-   listas sincronizáveis. Usado no Backoffice para "publicar" os dados já
-   existentes no browser de quem carrega no botão, na primeira vez que se
-   liga a sincronização. */
 function pushAllToCloud() {
   CLOUD_SYNC_KEYS.forEach(name => pushToCloud(name, loadStore(name)));
 }
 
 initCloudSync();
-
-/* ---------- Autenticação (password partilhada) ---------- */
-/* A password por defeito vem de auth.js (fora do repositório público).
-   O Backoffice permite mudar a password, guardando uma versão nova
-   (agora sincronizada via Firebase, como as restantes listas) que passa
-   a ter prioridade sobre a de auth.js para todos os membros. */
 
 async function sha256Hex(texto) {
   const bytes = new TextEncoder().encode(texto);
@@ -395,11 +315,6 @@ function logout() {
   window.location.href = "index.html";
 }
 
-/* ---------- Gestão de membros (usada pelo Backoffice) ---------- */
-/* Mantém sincronizados os dados de outros ecrãs que guardam informação
-   por membro (votos, reações da wishlist, respostas a eventos) quando
-   um membro é mudado de nome ou removido. */
-
 function renameMemberEverywhere(oldName, newName) {
   const votacao = loadStore("votacaoSemanal");
   if (votacao.votos && oldName in votacao.votos) {
@@ -447,8 +362,6 @@ function removeMemberEverywhere(name) {
   eventos.forEach(ev => { if (ev.respostas) delete ev.respostas[name]; });
   saveStore("eventos", eventos);
 }
-
-/* ---------- Navegação / cabeçalho comum ---------- */
 
 function renderHeader(activeHref) {
   const header = document.createElement("header");
@@ -518,15 +431,12 @@ function initPage(activeHref) {
   }
 }
 
-/* ---------- Utilitários ---------- */
-
 const TRASH_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
 
 const LOGOUT_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>';
 
 const SETTINGS_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>';
 
-/* Ícone do menu hamburger (mobile) e do respetivo estado aberto (X) */
 const MENU_ICON = '<svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
 const CLOSE_ICON = '<svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
@@ -570,10 +480,6 @@ function downloadJson(filename, data) {
   URL.revokeObjectURL(url);
 }
 
-/* ---------- Redimensionar colunas de tabelas (arrastar o limite direito
-   de cada cabeçalho). As larguras ficam guardadas no browser, por tabela,
-   e aplicam-se logo que a página volta a ser aberta. ---------- */
-
 function getSavedColWidths(key) {
   try {
     const raw = localStorage.getItem(storageKey(key));
@@ -604,7 +510,7 @@ function initColumnResize(table, storageName) {
   }
 
   ths.forEach((th, i) => {
-    if (i === ths.length - 1) return; // a última coluna (ações) não é redimensionável
+    if (i === ths.length - 1) return;
     const handle = document.createElement("span");
     handle.className = "col-resizer";
     th.appendChild(handle);
@@ -642,8 +548,6 @@ function initColumnResize(table, storageName) {
     handle.addEventListener("touchstart", onDown, { passive: false });
   });
 }
-
-/* ---------- Colunas configuráveis das tabelas de jogos (Backoffice) ---------- */
 
 function slugifyColId(label) {
   return String(label)

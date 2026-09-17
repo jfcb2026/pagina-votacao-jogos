@@ -64,8 +64,6 @@ function gameOptionsHtml(selected) {
   return html;
 }
 
-/* Mensagem breve confirmando qual "coluna" de jogo (Jogo 1, Jogo 2, ...)
-   acabou de ser votada, para dar confirmação imediata ao clicar. */
 let votoFeedbackTimer = null;
 
 function showVotoFeedback(idx) {
@@ -119,8 +117,6 @@ function render() {
   document.getElementById("fechar-votacao-btn").style.display = votosAbertos ? "" : "none";
   document.getElementById("desbloquear-votos-btn").style.display = fechadaNaoConfirmada ? "" : "none";
   document.getElementById("validar-btn").style.display = fechadaNaoConfirmada ? "" : "none";
-  /* "Reiniciar Votação" e "Sortear Vencedor" são geridos em renderResults,
-     que tem a informação do ranking; por omissão ficam escondidos. */
   document.getElementById("reiniciar-votacao-btn").style.display = "none";
   document.getElementById("sortear-vencedor-btn").style.display = "none";
   document.getElementById("validar-erro").textContent = "";
@@ -158,9 +154,6 @@ function renderResults() {
   `).join("") || `<li class="placeholder"><span>Ainda sem votos.</span></li>`;
 
   if (ranking.length === 0 || !votacao.confirmado) {
-    /* O vencedor só é anunciado depois de os votos serem validados
-       ("Validar Votos"); fechar a votação só fecha a tabela e mostra a
-       contagem, sem ainda anunciar quem ganhou. */
     winnerBox.innerHTML = "";
     winnerCard.style.display = "none";
     sortearBtn.style.display = "none";
@@ -171,24 +164,16 @@ function renderResults() {
   const topGames = ranking.filter(([, n]) => n === topCount);
 
   if (votacao.vencedorSorteado) {
-    /* Empate resolvido por sorteio: mostra o jogo sorteado em vez do
-       empate "cru" (que, em termos de contagem de votos, continua igual). */
     winnerBox.innerHTML = `<div class="winner-box">🎲 Jogo vencedor (sorteado):<br><span class="winner-name">${escapeHtml(votacao.vencedorSorteado)}</span></div>`;
     reabrirBtn.style.display = "none";
     reiniciarBtn.style.display = "";
     sortearBtn.style.display = "none";
   } else if (topGames.length > 1) {
-    /* Empate: não há vencedor para anunciar, por isso mantém-se a opção
-       de reabrir a votação (sem apagar os votos) para se poder desempatar,
-       ou sortear o vencedor entre os jogos empatados. */
     winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação" para desempatar, ou "Sortear Vencedor" para decidir ao acaso.</div>`;
     reabrirBtn.style.display = "";
     reiniciarBtn.style.display = "none";
     sortearBtn.style.display = "";
   } else {
-    /* Há um vencedor único anunciado: reabrir deixa de fazer sentido (não
-       há nada para desempatar), por isso o botão passa a ser "Reiniciar
-       Votação", para começar uma nova ronda de raiz. */
     winnerBox.innerHTML = `<div class="winner-box">🏆 Jogo vencedor:<br><span class="winner-name">${escapeHtml(topGames[0][0])}</span></div>`;
     reabrirBtn.style.display = "none";
     reiniciarBtn.style.display = "";
