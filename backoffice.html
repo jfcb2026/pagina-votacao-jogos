@@ -152,9 +152,10 @@
     <div class="backoffice-section">
       <h2>Password de Acesso</h2>
       <p class="hint">Password partilhada usada para entrar no site.</p>
-      <div class="inline-form">
-        <input type="password" id="new-password" placeholder="Nova password">
-        <button class="primary" id="save-password-btn">Guardar nova password</button>
+      <div class="password-form">
+        <input type="password" id="old-password" placeholder="Password atual" autocomplete="off">
+        <input type="password" id="new-password" placeholder="Nova password" autocomplete="off">
+        <button class="primary" id="save-password-btn">Guardar Alterações</button>
       </div>
       <p class="hint" id="password-msg"></p>
     </div>
@@ -192,7 +193,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=6"></script>
-<script src="assets/js/backoffice.js"></script>
+<script src="assets/js/common.js?v=8"></script>
+<script src="assets/js/backoffice.js?v=4"></script>
 </body>
 </html>

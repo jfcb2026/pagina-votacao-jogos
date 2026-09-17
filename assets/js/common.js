@@ -284,14 +284,45 @@ initCloudSync();
    (agora sincronizada via Firebase, como as restantes listas) que passa
    a ter prioridade sobre a de auth.js para todos os membros. */
 
+/* Hash SHA-256 em hexadecimal, usado para não guardar a password em
+   texto simples no localStorage / Firebase (ver também o bloco de login
+   em index.html, que faz o mesmo cálculo antes de common.js carregar). */
+async function sha256Hex(texto) {
+  const bytes = new TextEncoder().encode(texto);
+  const buffer = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
 function getActivePassword() {
   const override = loadStore("passwordOverride");
   if (override) return override;
   return (typeof SITE_PASSWORD !== "undefined") ? SITE_PASSWORD : "alterar123";
 }
 
-function setActivePassword(newPassword) {
-  saveStore("passwordOverride", newPassword);
+async function setActivePassword(newPassword) {
+  const hash = await sha256Hex(newPassword);
+  saveStore("passwordOverride", hash);
+}
+
+/* Confirma se "candidata" é a password atualmente em vigor — usada no
+   Backoffice para exigir a password atual antes de a deixar mudar.
+   Aceita tanto o hash novo (SHA-256) como, por compatibilidade, uma
+   password antiga ainda guardada em texto simples. */
+async function verifyActivePassword(candidata) {
+  const stored = loadStore("passwordOverride");
+  /* Tem de corresponder exatamente à password por defeito usada no ecrã
+     de login (index.html), que não depende de SITE_PASSWORD/auth.js. */
+  const defaultPassword = "alterar123";
+  try {
+    const digest = await sha256Hex(candidata);
+    const esperado = stored ? stored : await sha256Hex(defaultPassword);
+    if (digest === esperado) return true;
+    const legado = stored ? stored : defaultPassword;
+    return candidata === legado;
+  } catch (e) {
+    const legado = stored ? stored : defaultPassword;
+    return candidata === legado;
+  }
 }
 
 function isAuthenticated() {

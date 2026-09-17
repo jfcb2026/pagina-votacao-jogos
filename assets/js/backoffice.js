@@ -13,7 +13,21 @@ document.getElementById("empty-wishlist-btn").innerHTML = `Esvaziar lista da Wis
 document.getElementById("empty-habituais-btn").innerHTML = `Esvaziar Jogos Habituais${TRASH_ICON}`;
 document.getElementById("empty-nao-jogados-btn").innerHTML = `Esvaziar Jogos ainda não jogados${TRASH_ICON}`;
 document.getElementById("empty-links-btn").innerHTML = `Esvaziar Links${TRASH_ICON}`;
-document.getElementById("save-password-btn").innerHTML = `Guardar nova password${SAVE_ICON}`;
+document.getElementById("save-password-btn").innerHTML = `Guardar Alterações${SAVE_ICON}`;
+
+/* Os campos de password ficam com a mesma largura do botão "Guardar
+   Alterações" (que varia com o texto/ícone), em vez de ocuparem a
+   largura toda do form. */
+function syncPasswordFieldWidths() {
+  const btn = document.getElementById("save-password-btn");
+  const w = btn.getBoundingClientRect().width;
+  if (!w) return;
+  ["old-password", "new-password"].forEach(id => {
+    document.getElementById(id).style.width = w + "px";
+  });
+}
+syncPasswordFieldWidths();
+window.addEventListener("resize", syncPasswordFieldWidths);
 document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("save-horario-jogo-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
@@ -82,12 +96,24 @@ function renderThemes() {
 renderThemes();
 
 /* ---- Password ---- */
-document.getElementById("save-password-btn").addEventListener("click", () => {
-  const val = document.getElementById("new-password").value;
-  if (!val) { document.getElementById("password-msg").textContent = "Escreve uma password."; return; }
-  setActivePassword(val);
-  document.getElementById("new-password").value = "";
-  document.getElementById("password-msg").textContent = "Password atualizada.";
+document.getElementById("save-password-btn").addEventListener("click", async () => {
+  const oldInput = document.getElementById("old-password");
+  const newInput = document.getElementById("new-password");
+  const msg = document.getElementById("password-msg");
+  const oldVal = oldInput.value;
+  const newVal = newInput.value;
+
+  if (!oldVal) { msg.textContent = "Escreve a password atual."; return; }
+  if (!newVal) { msg.textContent = "Escreve a nova password."; return; }
+
+  msg.textContent = "A verificar...";
+  const correta = await verifyActivePassword(oldVal);
+  if (!correta) { msg.textContent = "Password atual incorreta."; return; }
+
+  await setActivePassword(newVal);
+  oldInput.value = "";
+  newInput.value = "";
+  msg.textContent = "Password atualizada.";
 });
 
 /* ---- Membros ---- */
