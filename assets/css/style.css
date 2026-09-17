@@ -838,6 +838,7 @@ table input[type="text"], table input[type="date"], table select, table textarea
 .status-dot-green { background: #2ecc71; }
 .status-dot-orange { background: #f39c12; }
 .status-dot-red { background: #e74c3c; }
+.status-dot-gray { background: #888; }
 
 .sync-status-prefix { color: var(--text-dim); }
 

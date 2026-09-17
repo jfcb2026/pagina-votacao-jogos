@@ -238,14 +238,38 @@ function refreshFromCloud() {
   if (typeof render === "function") { try { render(); } catch (e) { /* página sem render() */ } }
 }
 
+const _cloudUnsubscribers = {};
+
 function watchCloudKey(name) {
-  firebase.firestore().collection("jogosAmigos").doc(name).onSnapshot(snap => {
+  _cloudUnsubscribers[name] = firebase.firestore().collection("jogosAmigos").doc(name).onSnapshot(snap => {
     if (!snap.exists) return;
     const remote = snap.data();
     if (remote.updatedAt && remote.updatedAt === _lastPushedAt[name]) return; // eco da nossa própria escrita
     localStorage.setItem(storageKey(name), JSON.stringify(remote.value));
     refreshFromCloud();
   }, () => { /* sem permissão ou sem ligação: ignora, mantém o que está local */ });
+}
+
+/* Permite interromper/retomar manualmente a sincronização com a Nuvem
+   neste browser (botão no Backoffice), por exemplo para trabalhar
+   temporariamente offline sem enviar/receber alterações. Guardado em
+   sessionStorage: aplica-se a esta sessão de navegação (todas as páginas
+   abertas na mesma aba), sem afetar os outros membros nem outras abas. */
+function isCloudSyncPaused() {
+  try { return sessionStorage.getItem("jogosAmigos_cloudPaused") === "1"; } catch (e) { return false; }
+}
+
+function pauseCloudSync() {
+  Object.keys(_cloudUnsubscribers).forEach(name => {
+    try { _cloudUnsubscribers[name](); } catch (e) { /* ignora */ }
+  });
+  _cloudReady = false;
+  try { sessionStorage.setItem("jogosAmigos_cloudPaused", "1"); } catch (e) { /* ignora */ }
+}
+
+function resumeCloudSync() {
+  try { sessionStorage.removeItem("jogosAmigos_cloudPaused"); } catch (e) { /* ignora */ }
+  window.location.reload();
 }
 
 function initCloudSync() {
@@ -257,6 +281,7 @@ function initCloudSync() {
      funcionalidade existir — daí o try/catch: um erro aqui nunca pode
      impedir o resto deste ficheiro (cabeçalho, tabelas, etc.) de correr. */
   try {
+    if (isCloudSyncPaused()) return;
     if (typeof firebase === "undefined") return;
     if (!firebase.apps || !firebase.apps.length) return; // sem firebase-config.js, nenhuma app inicializada
     const autenticado = isAuthenticated();
@@ -528,6 +553,7 @@ const CALENDAR_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" 
 const DICE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" ry="3"></rect><circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none"></circle></svg>';
 
 const CLOUD_UPLOAD_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path><polyline points="12 12 12 21"></polyline><polyline points="9 15 12 12 15 15"></polyline></svg>';
+const STOP_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6" fill="currentColor" stroke="none"></rect></svg>';
 
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, s => ({

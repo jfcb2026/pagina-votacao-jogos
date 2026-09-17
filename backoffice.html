@@ -161,21 +161,14 @@
     </div>
 
     <div class="backoffice-section">
-      <h2>Sincronização entre Membros (nuvem)</h2>
+      <h2>Sincronização com a Nuvem de Dados</h2>
+      <p class="hint">As alterações feitas no site já são enviadas automaticamente para a Nuvem. Só precisas de "Enviar dados" se este browser tinha dados antigos por enviar, ou se quiseres forçar um reenvio. "Parar Ligação com a Nuvem" serve para trabalhares offline temporariamente neste browser, sem enviar nem receber alterações.</p>
       <p class="sync-status"><span class="sync-status-prefix">Estado da Ligação: </span><span class="status-dot" id="sync-status-dot"></span><span id="sync-status-label">A verificar...</span></p>
-      <p class="hint">Todas as alterações feitas no site (votos, jogos, eventos, etc.) já são enviadas automaticamente para a nuvem, não precisas de carregar neste botão no dia a dia. Só é preciso usá-lo em dois casos: (1) uma única vez, se este browser já tinha dados próprios guardados antes de a sincronização ficar ativa, para os enviar para a nuvem; ou (2) se achares que a sincronização falhou e queres forçar o reenvio dos dados atuais deste browser para a nuvem.</p>
       <div class="actions-row">
-        <button class="primary" id="sync-push-btn">Enviar dados deste browser para a nuvem</button>
+        <button class="primary" id="sync-push-btn">Enviar dados deste browser para a Nuvem</button>
+        <button class="danger" id="sync-toggle-btn">Parar Ligação com a Nuvem</button>
       </div>
       <p class="hint" id="sync-msg"></p>
-    </div>
-
-    <div class="backoffice-section">
-      <h2>Exportar dados</h2>
-      <p class="hint">Descarrega o estado atual de cada lista como ficheiro JSON, para colocar em assets/data/ e enviar (commit) para o repositório.</p>
-      <div class="actions-row">
-        <button id="export-all-btn">Exportar tudo</button>
-      </div>
     </div>
 
     <div class="backoffice-section">
@@ -194,7 +187,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=13"></script>
-<script src="assets/js/backoffice.js?v=5"></script>
+<script src="assets/js/common.js?v=15"></script>
+<script src="assets/js/backoffice.js?v=8"></script>
 </body>
 </html>

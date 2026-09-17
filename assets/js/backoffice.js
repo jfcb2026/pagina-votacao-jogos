@@ -1,6 +1,5 @@
 initPage("backoffice.html");
 
-document.getElementById("export-all-btn").innerHTML = `Exportar tudo${EXPORT_ICON}`;
 document.getElementById("add-member-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-habituais-btn").innerHTML = `Adicionar${PLUS_ICON}`;
 document.getElementById("add-col-nao-jogados-btn").innerHTML = `Adicionar${PLUS_ICON}`;
@@ -30,18 +29,34 @@ syncPasswordFieldWidths();
 window.addEventListener("resize", syncPasswordFieldWidths);
 document.getElementById("save-site-name-btn").innerHTML = `Guardar${SAVE_ICON}`;
 document.getElementById("save-horario-jogo-btn").innerHTML = `Guardar${SAVE_ICON}`;
-document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a nuvem${CLOUD_UPLOAD_ICON}`;
+document.getElementById("sync-push-btn").innerHTML = `Enviar dados deste browser para a Nuvem${CLOUD_UPLOAD_ICON}`;
+function syncToggleLabel() {
+  return isCloudSyncPaused()
+    ? `Retomar Ligação com a Nuvem${UNLOCK_ICON}`
+    : `Parar Ligação com a Nuvem${STOP_ICON}`;
+}
+function atualizarBotaoSyncToggle() {
+  const btn = document.getElementById("sync-toggle-btn");
+  btn.innerHTML = syncToggleLabel();
+  btn.classList.toggle("danger", !isCloudSyncPaused());
+}
+atualizarBotaoSyncToggle();
 document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
 document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
 document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloqueio da Votação${UNLOCK_ICON}`;
 document.getElementById("clear-votacao-atual-btn").innerHTML = `Limpar Votação Atual${TRASH_ICON}`;
 
-/* ---- Sincronização com a nuvem ---- */
+/* ---- Sincronização com a Nuvem ---- */
 function atualizarEstadoLigacao() {
   const dot = document.getElementById("sync-status-dot");
   const label = document.getElementById("sync-status-label");
   if (!dot || !label) return;
 
+  if (isCloudSyncPaused()) {
+    dot.className = "status-dot status-dot-gray";
+    label.textContent = "Ligação interrompida";
+    return;
+  }
   if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) {
     dot.className = "status-dot status-dot-red";
     label.textContent = "Sincronização não configurada neste site";
@@ -54,11 +69,11 @@ function atualizarEstadoLigacao() {
   }
   if (_cloudReady) {
     dot.className = "status-dot status-dot-green";
-    label.textContent = "Ligado à nuvem";
+    label.textContent = "Ligado à Nuvem";
     return;
   }
   dot.className = "status-dot status-dot-orange";
-  label.textContent = "A ligar à nuvem...";
+  label.textContent = "A ligar à Nuvem...";
 }
 atualizarEstadoLigacao();
 setInterval(atualizarEstadoLigacao, 2000);
@@ -71,12 +86,29 @@ document.getElementById("sync-push-btn").addEventListener("click", () => {
     msg.textContent = "A sincronização não está configurada neste site.";
     return;
   }
+  if (isCloudSyncPaused()) {
+    msg.textContent = "A ligação com a Nuvem está interrompida. Clica em \"Retomar Ligação com a Nuvem\" primeiro.";
+    return;
+  }
   if (!_cloudReady) {
-    msg.textContent = "Ainda a ligar à nuvem, tenta novamente daqui a alguns segundos.";
+    msg.textContent = "Ainda a ligar à Nuvem, tenta novamente daqui a alguns segundos.";
     return;
   }
   pushAllToCloud();
-  msg.textContent = "Dados enviados para a nuvem.";
+  msg.textContent = "Dados enviados para a Nuvem.";
+});
+
+document.getElementById("sync-toggle-btn").addEventListener("click", () => {
+  const msg = document.getElementById("sync-msg");
+  if (isCloudSyncPaused()) {
+    resumeCloudSync();
+    return;
+  }
+  if (!confirm("Isto interrompe a sincronização com a Nuvem neste browser: as alterações feitas aqui deixam de ser enviadas ou recebidas até retomares. Continuar?")) return;
+  pauseCloudSync();
+  atualizarBotaoSyncToggle();
+  msg.textContent = "Ligação com a Nuvem interrompida neste browser.";
+  atualizarEstadoLigacao();
 });
 
 /* ---- Nome do Site ---- */
@@ -410,19 +442,6 @@ initColumnManager("colunasNaoJogados", "cols-nao-jogados", "new-col-nao-jogados"
 initColumnManager("colunasWishlist", "cols-wishlist", "new-col-wishlist", "add-col-wishlist-btn");
 initColumnManager("colunasEventos", "cols-eventos", "new-col-eventos", "add-col-eventos-btn");
 initColumnManager("colunasLinks", "cols-links", "new-col-links", "add-col-links-btn");
-
-/* ---- Exportar dados ---- */
-document.getElementById("export-all-btn").addEventListener("click", () => {
-  downloadJson("membros.json", loadStore("membros"));
-  downloadJson("jogos-habituais.json", loadStore("jogosHabituais"));
-  downloadJson("jogos-nao-jogados.json", loadStore("jogosNaoJogados"));
-  downloadJson("wishlist.json", loadStore("wishlist"));
-  downloadJson("passeios.json", loadStore("eventos"));
-  downloadJson("votacao.json", loadStore("votacaoSemanal"));
-  downloadJson("historico-vencedores.json", loadStore("historicoVencedores"));
-  downloadJson("dia-semana-jogo.json", loadStore("diaSemanaJogo"));
-  downloadJson("links.json", loadStore("links"));
-});
 
 /* ---- Cópia de Segurança (Backup) ----
    Ao contrário do "Exportar tudo" acima (pensado para atualizar os
