@@ -259,13 +259,44 @@ function initCloudSync() {
   try {
     if (typeof firebase === "undefined") return;
     if (!firebase.apps || !firebase.apps.length) return; // sem firebase-config.js, nenhuma app inicializada
-    const keys = isAuthenticated() ? CLOUD_SYNC_KEYS : ["passwordOverride"];
+    const autenticado = isAuthenticated();
+    const keys = autenticado ? CLOUD_SYNC_KEYS : ["passwordOverride"];
     firebase.auth().onAuthStateChanged(user => {
       if (!user) return;
       _cloudReady = true;
       keys.forEach(watchCloudKey);
     });
     firebase.auth().signInAnonymously().catch(() => { /* sem sincronização, fica só local */ });
+
+    /* Numa página autenticada (já com o menu principal, tabelas, etc.),
+       as variáveis com os dados (membros, jogos, votos...) são lidas do
+       localStorage só uma vez, no arranque do script de cada página —
+       não se atualizam sozinhas quando o Firestore traz dados mais
+       recentes a meio da sessão (o "onSnapshot" atualiza o localStorage e
+       chama render(), mas render() continua a usar essas variáveis já
+       carregadas). Isto era mais raro de notar antes, porque a
+       sincronização já tinha corrido nalguma página anterior (por
+       exemplo o ecrã de login); agora que só começa a sincronizar tudo
+       depois de autenticado, é mais provável apanhar a primeira página
+       ainda com os dados de exemplo, até se dar um F5. Para evitar ter de
+       fazer isso manualmente, faz-se aqui o mesmo tipo de recarregamento
+       automático e silencioso, uma única vez por sessão de browser, que
+       já existia em index.html para a password. */
+    try {
+      if (autenticado && !sessionStorage.getItem("jogosAmigos_autoReloadDados")) {
+        sessionStorage.setItem("jogosAmigos_autoReloadDados", "1");
+        /* Esconde o conteúdo principal (a tabela com os dados de exemplo
+           "Membro 1", "Membro 2", ...) enquanto se espera pelo
+           recarregamento automático, para quem está a ver o ecrã não
+           chegar a notar esses valores de exemplo. O cabeçalho/menu fica
+           visível na mesma, é só o <main> de cada página. */
+        const main = document.querySelector("main");
+        if (main) main.style.visibility = "hidden";
+        window.addEventListener("load", () => {
+          setTimeout(() => window.location.reload(), 900);
+        });
+      }
+    } catch (e) { /* sem sessionStorage: sem refresh automático, mas o site continua a funcionar */ }
   } catch (e) { /* sem sincronização, fica só local */ }
 }
 
