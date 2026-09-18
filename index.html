@@ -66,6 +66,14 @@ try {
             unsubscribe();
             resolve(true);
           });
+          /* Se a autenticação anónima feita em common.js (ao carregar a
+             página) tiver falhado por uma instabilidade pontual de rede,
+             nunca mais chegaria nenhum evento e ficaria sempre à espera até
+             ao timeout, obrigando a um refresh manual para tentar de novo.
+             Este pedido extra garante que o próprio clique em "Entrar"
+             também tenta autenticar - é seguro repetir, o Firebase devolve
+             a mesma sessão se já existir uma, ou tenta uma nova. */
+          auth.signInAnonymously().catch(() => { /* falha tratada pelo timeout abaixo */ });
           setTimeout(() => {
             if (resolvido) return;
             resolvido = true;
