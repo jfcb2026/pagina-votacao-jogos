@@ -22,7 +22,7 @@ function renderColCell(c, jogo, idx) {
     return `
       <td>
         <div class="link-cell">
-          <button type="button" class="icon-btn link-open-btn" data-idx="${idx}" title="Abrir link">${EXTERNAL_LINK_ICON}</button>
+          <button type="button" class="small link-open-btn" data-idx="${idx}">Abrir Link${EXTERNAL_LINK_ICON}</button>
           <button type="button" class="icon-btn link-edit-btn" data-idx="${idx}" title="Editar link">${EDIT_ICON}</button>
         </div>
       </td>

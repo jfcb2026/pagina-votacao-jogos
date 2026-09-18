@@ -378,6 +378,15 @@ button.migrate-btn {
 }
 button.migrate-btn:hover { filter: brightness(0.9); border-color: var(--accent); }
 
+/* Wishlist: botão "Abrir Link" com a mesma cor de destaque do "Migrar p/
+   Habituais" */
+button.link-open-btn {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+button.link-open-btn:hover { filter: brightness(0.9); border-color: var(--accent); }
+
 /* Backoffice: o botão de limpar reações fica a laranja */
 #clear-reactions-btn {
   background: var(--warn);
