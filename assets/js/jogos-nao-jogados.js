@@ -60,7 +60,7 @@ function renderHead() {
     `<col style="width:130px"><col class="col-actions" style="width:290px">`;
 
   document.getElementById("table-head").innerHTML =
-    colunas.map(c => `<th>${escapeHtml(c.label)}</th>`).join("") +
+    colunas.map(c => `<th${c.id === "link" ? " class=\"text-center\"" : ""}>${escapeHtml(c.label)}</th>`).join("") +
     membros.map(m => `<th class="text-center">${escapeHtml(m)}</th>`).join("") +
     `<th class="text-center">Votação</th><th class="col-actions"></th>`;
 }
