@@ -5,6 +5,31 @@ document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICO
 let jogos = loadStore("wishlist");
 let membros = loadStore("membros");
 let colunas = loadStore("colunasWishlist");
+let editingLink = {};
+
+function normalizeLinkUrl(valor) {
+  const v = (valor || "").trim();
+  if (!v) return v;
+  return /^https?:\/\//i.test(v) ? v : "https://" + v;
+}
+
+function renderColCell(c, jogo, idx) {
+  const val = jogo[c.id] ?? "";
+  if (c.id === "link") {
+    if (editingLink[idx] || !val) {
+      return `<td><input type="text" class="link-input" data-field="link" data-idx="${idx}" value="${escapeHtml(val)}" placeholder="Cola aqui o link"></td>`;
+    }
+    return `
+      <td>
+        <div class="link-cell">
+          <button type="button" class="icon-btn link-open-btn" data-idx="${idx}" title="Abrir link">${EXTERNAL_LINK_ICON}</button>
+          <button type="button" class="icon-btn link-edit-btn" data-idx="${idx}" title="Editar link">${EDIT_ICON}</button>
+        </div>
+      </td>
+    `;
+  }
+  return `<td><input type="text" data-field="${c.id}" value="${escapeHtml(val)}"></td>`;
+}
 
 function persist() { saveStore("wishlist", jogos); }
 
@@ -49,7 +74,7 @@ function render() {
     const { likes, dislikes } = countReactions(j.reacoes);
     return `
       <tr data-idx="${i}">
-        ${colunas.map(c => `<td><input type="text" data-field="${c.id}" value="${escapeHtml(j[c.id] ?? "")}"></td>`).join("")}
+        ${colunas.map(c => renderColCell(c, j, i)).join("")}
         ${membros.map(m => {
           const reacao = j.reacoes[m] || "";
           return `
@@ -78,11 +103,42 @@ function render() {
     });
   });
 
+  body.querySelectorAll(".link-input").forEach(input => {
+    function sair() {
+      const idx = Number(input.dataset.idx);
+      if ((jogos[idx].link || "").trim()) {
+        delete editingLink[idx];
+        render();
+      }
+    }
+    input.addEventListener("blur", sair);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") input.blur(); });
+  });
+
+  body.querySelectorAll(".link-open-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      const url = normalizeLinkUrl(jogos[idx].link);
+      if (url) window.open(url, "_blank", "noopener");
+    });
+  });
+
+  body.querySelectorAll(".link-edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      editingLink[idx] = true;
+      render();
+      const input = body.querySelector(`.link-input[data-idx="${idx}"]`);
+      if (input) input.focus();
+    });
+  });
+
   body.querySelectorAll(".remove-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.idx);
       if (!confirm(`Remover "${jogos[idx][coreCol().id]}"?`)) return;
       jogos.splice(idx, 1);
+      editingLink = {};
       persist();
       render();
     });
@@ -98,6 +154,7 @@ function render() {
       habituais.push({ jogo: nome, jogadores: "", dispositivo: "", link: jogo.link || "" });
       saveStore("jogosHabituais", habituais);
       jogos.splice(idx, 1);
+      editingLink = {};
       persist();
       render();
     });

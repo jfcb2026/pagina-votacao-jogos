@@ -596,6 +596,8 @@ table input[type="text"], table input[type="date"], table select, table textarea
 
 .reaction-btns { display: flex; gap: 4px; align-items: center; }
 
+.link-cell { display: flex; gap: 4px; align-items: center; }
+
 .reaction-btns button.like.active { background: var(--good); border-color: var(--good); color: #08221a; }
 .reaction-btns button.dislike.active { background: var(--bad); border-color: var(--bad); color: #2a0808; }
 
