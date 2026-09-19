@@ -1,7 +1,7 @@
 initPage("passeios.html");
 
 let eventos = loadStore("eventos");
-let membros = loadStore("membros");
+let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let colunas = loadStore("colunasEventos");
 
 function persist() { saveStore("eventos", eventos); }

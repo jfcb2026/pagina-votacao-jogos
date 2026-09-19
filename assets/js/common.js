@@ -577,3 +577,50 @@ function readExcelFile(file, callback) {
   };
   reader.readAsArrayBuffer(file);
 }
+
+function openFormModal({ title, fields, values = {}, submitLabel = "Adicionar", onSubmit }) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.innerHTML = `
+    <div class="modal">
+      <div class="modal-header">
+        <h2>${escapeHtml(title)}</h2>
+        <button type="button" class="modal-close" aria-label="Fechar">&times;</button>
+      </div>
+      <form>
+        ${fields.map(f => `
+          <label class="modal-field">
+            <span>${escapeHtml(f.label)}</span>
+            <input type="text" name="${escapeHtml(f.id)}" value="${escapeHtml(values[f.id] ?? "")}" ${f.required ? "required" : ""}>
+          </label>
+        `).join("")}
+        <div class="modal-actions">
+          <button type="button" class="modal-cancel">Cancelar</button>
+          <button type="submit" class="primary">${escapeHtml(submitLabel)}</button>
+        </div>
+      </form>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  function close() { overlay.remove(); }
+
+  overlay.querySelector(".modal-close").addEventListener("click", close);
+  overlay.querySelector(".modal-cancel").addEventListener("click", close);
+  overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+  document.addEventListener("keydown", function onEsc(e) {
+    if (e.key === "Escape") { close(); document.removeEventListener("keydown", onEsc); }
+  });
+
+  const form = overlay.querySelector("form");
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const dados = {};
+    fields.forEach(f => { dados[f.id] = form.elements[f.id].value; });
+    close();
+    onSubmit(dados);
+  });
+
+  const firstInput = form.querySelector("input");
+  if (firstInput) firstInput.focus();
+}

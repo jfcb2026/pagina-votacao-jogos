@@ -1,6 +1,6 @@
 initPage("votacao-semanal.html");
 
-let membros = loadStore("membros");
+let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let jogosHabituais = loadStore("jogosHabituais");
 let jogosNaoJogados = loadStore("jogosNaoJogados");
 let votacao = loadStore("votacaoSemanal");

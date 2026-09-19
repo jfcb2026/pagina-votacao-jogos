@@ -30,6 +30,8 @@ function renderHead() {
 }
 
 function render() {
+  const core = coreCol();
+  jogos.sort((a, b) => String(a[core.id] ?? "").localeCompare(String(b[core.id] ?? ""), "pt", { sensitivity: "base" }));
   updateHint();
   renderHead();
   const body = document.getElementById("table-body");
@@ -48,6 +50,10 @@ function render() {
     });
   });
 
+  body.querySelectorAll(`input[data-field="${core.id}"]`).forEach(input => {
+    input.addEventListener("blur", () => render());
+  });
+
   body.querySelectorAll(".remove-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.idx);
@@ -62,11 +68,18 @@ function render() {
 }
 
 document.getElementById("add-jogo-btn").addEventListener("click", () => {
-  const novo = {};
-  colunas.forEach(c => novo[c.id] = "");
-  jogos.push(novo);
-  persist();
-  render();
+  openFormModal({
+    title: "Novo Jogo",
+    fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
+    submitLabel: "Adicionar",
+    onSubmit: dados => {
+      const novo = {};
+      colunas.forEach(c => novo[c.id] = dados[c.id] || "");
+      jogos.push(novo);
+      persist();
+      render();
+    }
+  });
 });
 
 document.getElementById("import-btn").addEventListener("click", () => {

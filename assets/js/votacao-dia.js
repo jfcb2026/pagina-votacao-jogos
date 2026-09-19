@@ -1,6 +1,6 @@
 initPage("votacao-dia.html");
 
-let membros = loadStore("membros");
+let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let votacaoDia = loadStore("votacaoDia");
 if (!votacaoDia.voto) votacaoDia.voto = {};
 if (typeof votacaoDia.aplicado !== "boolean") votacaoDia.aplicado = false;

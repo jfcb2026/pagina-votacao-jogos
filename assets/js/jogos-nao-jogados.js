@@ -3,7 +3,7 @@ initPage("jogos-nao-jogados.html");
 document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICON}`;
 
 let jogos = loadStore("jogosNaoJogados");
-let membros = loadStore("membros");
+let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let colunas = loadStore("colunasNaoJogados");
 let editingLink = {};
 
@@ -66,6 +66,8 @@ function renderHead() {
 }
 
 function render() {
+  const core = coreCol();
+  jogos.sort((a, b) => String(a[core.id] ?? "").localeCompare(String(b[core.id] ?? ""), "pt", { sensitivity: "base" }));
   updateHint();
   renderHead();
   const body = document.getElementById("table-body");
@@ -101,6 +103,10 @@ function render() {
       jogos[idx][input.dataset.field] = input.value;
       persist();
     });
+  });
+
+  body.querySelectorAll(`input[data-field="${core.id}"]`).forEach(input => {
+    input.addEventListener("blur", () => render());
   });
 
   body.querySelectorAll(".link-input").forEach(input => {
@@ -177,11 +183,18 @@ function render() {
 }
 
 document.getElementById("add-jogo-btn").addEventListener("click", () => {
-  const novo = { reacoes: {} };
-  colunas.forEach(c => novo[c.id] = "");
-  jogos.push(novo);
-  persist();
-  render();
+  openFormModal({
+    title: "Novo Jogo",
+    fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
+    submitLabel: "Adicionar",
+    onSubmit: dados => {
+      const novo = { reacoes: {} };
+      colunas.forEach(c => novo[c.id] = dados[c.id] || "");
+      jogos.push(novo);
+      persist();
+      render();
+    }
+  });
 });
 
 document.getElementById("import-btn").addEventListener("click", () => {
