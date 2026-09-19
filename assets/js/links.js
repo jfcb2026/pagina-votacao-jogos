@@ -73,11 +73,18 @@ function syncTableWidth() {
 }
 
 document.getElementById("add-link-btn").addEventListener("click", () => {
-  const novo = {};
-  colunas.forEach(c => novo[c.id] = "");
-  links.push(novo);
-  persist();
-  render();
+  openFormModal({
+    title: "Novo Link",
+    fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
+    submitLabel: "Adicionar",
+    onSubmit: dados => {
+      const novo = {};
+      colunas.forEach(c => novo[c.id] = dados[c.id] || "");
+      links.push(novo);
+      persist();
+      render();
+    }
+  });
 });
 
 document.getElementById("import-btn").addEventListener("click", () => {

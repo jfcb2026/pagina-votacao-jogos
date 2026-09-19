@@ -120,11 +120,18 @@ function render() {
 }
 
 document.getElementById("add-evento-btn").addEventListener("click", () => {
-  const novo = { respostas: {} };
-  colunas.forEach(c => novo[c.id] = "");
-  eventos.push(novo);
-  persist();
-  render();
+  openFormModal({
+    title: "Novo Passeio",
+    fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
+    submitLabel: "Adicionar",
+    onSubmit: dados => {
+      const novo = { respostas: {} };
+      colunas.forEach(c => novo[c.id] = dados[c.id] || "");
+      eventos.push(novo);
+      persist();
+      render();
+    }
+  });
 });
 
 render();
