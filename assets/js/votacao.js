@@ -7,6 +7,7 @@ let votacao = loadStore("votacaoSemanal");
 if (typeof votacao.validado !== "boolean") votacao.validado = false;
 if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
 if (typeof votacao.vencedorSorteado === "undefined") votacao.vencedorSorteado = null;
+if (!votacao.naoVouJogar) votacao.naoVouJogar = {};
 
 (function renderDiaJogoLabel() {
   const dataLabel = nextGameDateLabel(loadStore("diaSemanaJogo"));
@@ -26,9 +27,13 @@ function ensureVotosStructure() {
     if (!Array.isArray(votacao.votos[m])) votacao.votos[m] = [];
     while (votacao.votos[m].length < votacao.slots) votacao.votos[m].push("");
     votacao.votos[m] = votacao.votos[m].slice(0, votacao.slots);
+    if (typeof votacao.naoVouJogar[m] !== "boolean") votacao.naoVouJogar[m] = false;
   });
   Object.keys(votacao.votos).forEach(m => {
     if (!membros.includes(m)) delete votacao.votos[m];
+  });
+  Object.keys(votacao.naoVouJogar).forEach(m => {
+    if (!membros.includes(m)) delete votacao.naoVouJogar[m];
   });
 }
 
@@ -38,6 +43,10 @@ function persist() {
 
 function hasAnyVote() {
   return Object.values(votacao.votos).some(votos => votos.some(v => v));
+}
+
+function temVotoAlgum(m) {
+  return votacao.votos[m].some(v => v);
 }
 
 function gameOptionsHtml(selected) {
@@ -81,29 +90,63 @@ function clearVotoFeedback() {
   el.textContent = "";
 }
 
+function renderRow(m) {
+  const votos = votacao.votos[m];
+  const votouAlgo = temVotoAlgum(m);
+  const naoVai = !!votacao.naoVouJogar[m] && !votouAlgo;
+
+  const semVoto = votacao.validado && !votouAlgo && !votacao.naoVouJogar[m];
+
+  const gamesCellsHtml = naoVai
+    ? `<td colspan="${votacao.slots}" class="text-center"><span class="hint">Não vai jogar esta semana</span></td>`
+    : semVoto
+      ? `<td colspan="${votacao.slots}" class="text-center"><span class="hint">Não votou</span></td>`
+      : votos.map((v, i) => `
+        <td><select data-membro="${escapeHtml(m)}" data-idx="${i}" ${votacao.validado ? "disabled" : ""}>${gameOptionsHtml(v)}</select></td>
+      `).join("");
+
+  let actionCellHtml = "<td></td>";
+  if (!votacao.validado && !votouAlgo) {
+    actionCellHtml = naoVai
+      ? `<td class="text-center"><button type="button" class="small success toggle-jogar-btn" data-membro="${escapeHtml(m)}">Vou jogar${CHECK_ICON}</button></td>`
+      : `<td class="text-center"><button type="button" class="small danger toggle-jogar-btn" data-membro="${escapeHtml(m)}">Não vou jogar${X_ICON}</button></td>`;
+  }
+
+  return `
+    <tr data-membro="${escapeHtml(m)}">
+      <td>${escapeHtml(m)}</td>
+      ${gamesCellsHtml}
+      ${actionCellHtml}
+    </tr>
+  `;
+}
+
 function render() {
   ensureVotosStructure();
 
   const head = document.getElementById("votacao-head");
   head.innerHTML = `<th>Membro</th>` +
-    Array.from({ length: votacao.slots }).map((_, i) => `<th>Jogo ${i + 1}</th>`).join("");
+    Array.from({ length: votacao.slots }).map((_, i) => `<th>Jogo ${i + 1}</th>`).join("") +
+    `<th></th>`;
 
   const body = document.getElementById("votacao-body");
-  body.innerHTML = membros.map(m => `
-    <tr data-membro="${escapeHtml(m)}">
-      <td>${escapeHtml(m)}</td>
-      ${votacao.votos[m].map((v, i) => `
-        <td><select data-membro="${escapeHtml(m)}" data-idx="${i}" ${votacao.validado ? "disabled" : ""}>${gameOptionsHtml(v)}</select></td>
-      `).join("")}
-    </tr>
-  `).join("");
+  body.innerHTML = membros.map(renderRow).join("");
+
+  body.querySelectorAll(".toggle-jogar-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const m = btn.dataset.membro;
+      votacao.naoVouJogar[m] = !votacao.naoVouJogar[m];
+      persist();
+      render();
+    });
+  });
 
   body.querySelectorAll("select").forEach(sel => {
     sel.addEventListener("change", () => {
       const m = sel.dataset.membro, i = Number(sel.dataset.idx);
       votacao.votos[m][i] = sel.value;
       persist();
-      renderResults();
+      render();
       if (sel.value) {
         showVotoFeedback(i);
       } else {
@@ -278,6 +321,9 @@ document.getElementById("reiniciar-votacao-btn").addEventListener("click", () =>
   votacao.vencedorSorteado = null;
   Object.keys(votacao.votos).forEach(m => {
     votacao.votos[m] = votacao.votos[m].map(() => "");
+  });
+  Object.keys(votacao.naoVouJogar).forEach(m => {
+    votacao.naoVouJogar[m] = false;
   });
   persist();
   render();
