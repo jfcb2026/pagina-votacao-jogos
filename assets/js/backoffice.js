@@ -303,9 +303,48 @@ document.getElementById("clear-votacao-atual-btn").addEventListener("click", () 
   document.getElementById("clear-votacao-atual-msg").textContent = "Votação atual limpa.";
 });
 
+let historicoVencedores = loadStore("historicoVencedores");
+
+function formatarDataFecho(iso) {
+  const d = iso ? new Date(iso) : null;
+  if (!d || isNaN(d.getTime())) return "sem data de fecho registada";
+  return d.toLocaleDateString("pt-PT", { day: "2-digit", month: "2-digit", year: "numeric" }) +
+    " às " + d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit" });
+}
+
+function renderHistorico() {
+  const list = document.getElementById("historico-list");
+  if (!list) return;
+  const ordenado = historicoVencedores.map((entry, idx) => ({ entry, idx })).reverse();
+  list.innerHTML = ordenado.map(({ entry, idx }) => `
+    <div class="historico-row">
+      <div class="historico-info">
+        <span class="historico-jogo-nome">${entry.sorteio ? "🎲" : "🏆"} ${escapeHtml(entry.vencedor || "(sem vencedor registado)")}</span>
+        <span class="historico-data-fecho">Fechada em: ${formatarDataFecho(entry.data)}</span>
+      </div>
+      <button class="small danger remove-historico-btn" data-idx="${idx}">Remover${TRASH_ICON}</button>
+    </div>
+  `).join("") || `<p class="hint">Ainda sem histórico.</p>`;
+
+  list.querySelectorAll(".remove-historico-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      const entry = historicoVencedores[idx];
+      if (!confirm(`Remover esta votação do histórico ("${entry.vencedor || "sem vencedor"}")? Esta ação não pode ser desfeita.`)) return;
+      historicoVencedores.splice(idx, 1);
+      saveStore("historicoVencedores", historicoVencedores);
+      renderHistorico();
+    });
+  });
+}
+
+renderHistorico();
+
 document.getElementById("clear-historico-btn").addEventListener("click", () => {
   if (!confirm("Limpar o histórico de jogos vencedores e a votação atual (votos e validação)? Esta ação não pode ser desfeita.")) return;
   emptyStore("historicoVencedores", []);
+  historicoVencedores = [];
+  renderHistorico();
 
   votacao.validado = false;
   Object.keys(votacao.votos).forEach(m => {
@@ -473,4 +512,14 @@ document.getElementById("import-backup-input").addEventListener("change", () => 
     setTimeout(() => window.location.reload(), 1200);
   };
   reader.readAsText(file);
+});
+
+document.querySelectorAll(".settings-nav-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".settings-nav-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".settings-panel").forEach(p => { p.hidden = true; });
+    btn.classList.add("active");
+    const panel = document.querySelector(`.settings-panel[data-panel="${btn.dataset.target}"]`);
+    if (panel) panel.hidden = false;
+  });
 });

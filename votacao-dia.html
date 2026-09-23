@@ -6,6 +6,7 @@
 <title>Votação do Dia de Jogo — Página De Jogos De Amigos</title>
 <link rel="stylesheet" href="assets/css/style.css">
 <script>try{var t=JSON.parse(localStorage.getItem("jogosAmigos_tema"));if(t)document.documentElement.setAttribute("data-theme",t);}catch(e){}</script>
+<script>try{if(sessionStorage.getItem("jogosAmigos_auth")!=="ok"){sessionStorage.setItem("jogosAmigos_redirect",(location.pathname.split("/").pop())||"votacao-semanal.html");location.replace("index.html");}}catch(e){}</script>
 </head>
 <body>
 <main>
@@ -32,7 +33,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=19"></script>
+<script src="assets/js/common.js?v=20"></script>
 <script src="assets/js/votacao-dia.js?v=8"></script>
 </body>
 </html>

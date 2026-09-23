@@ -915,3 +915,81 @@ table input[type="text"], table input[type="date"], table select, table textarea
   gap: 8px;
   margin-top: 18px;
 }
+
+.historico-list { display: flex; flex-direction: column; gap: 6px; margin: 10px 0; max-width: 30%; }
+.historico-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.historico-row .historico-info { display: flex; flex-direction: column; gap: 2px; }
+.historico-row .historico-jogo-nome { font-weight: 600; }
+.historico-row .historico-data-fecho { font-size: 0.78rem; color: var(--text-dim); }
+
+.settings-layout { display: flex; align-items: flex-start; gap: 20px; }
+
+.settings-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 220px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px;
+}
+
+.settings-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.settings-nav-btn:hover { border-color: var(--border); background: var(--bg-alt); }
+
+.settings-nav-btn.active {
+  background: var(--card);
+  border-color: var(--border);
+  font-weight: 600;
+}
+
+.settings-nav-btn svg { flex-shrink: 0; }
+
+.settings-content { flex: 1; min-width: 0; }
+
+@media (max-width: 780px) {
+  .settings-layout { flex-direction: column; }
+  .settings-nav {
+    flex-direction: row;
+    width: 100%;
+    overflow-x: auto;
+    position: static;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+  .settings-nav-btn { width: auto; white-space: nowrap; flex-shrink: 0; }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

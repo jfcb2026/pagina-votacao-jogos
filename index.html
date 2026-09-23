@@ -13,6 +13,7 @@
   <div class="login-card">
     <h1 id="site-name-heading">🎮 Página De Jogos De Amigos</h1>
     <p class="subtitle">Introduz a password de acesso</p>
+    <label for="password-input" class="sr-only">Password de acesso</label>
     <input type="password" id="password-input" placeholder="Password" autofocus>
     <div class="login-error" id="login-error"></div>
     <button class="primary" id="login-btn" style="width:100%">Entrar</button>
@@ -148,7 +149,7 @@ try {
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=19"></script>
+<script src="assets/js/common.js?v=20"></script>
 <script>
 try {
   document.getElementById("site-name-heading").textContent = "🎮 " + loadStore("nomeSite");

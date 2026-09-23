@@ -153,7 +153,11 @@ function loadStore(name) {
     if (name in _memoryStore) return _memoryStore[name];
   }
   const seed = JSON.parse(JSON.stringify(DEFAULT_DATA[name]));
-  saveStore(name, seed);
+  try {
+    localStorage.setItem(storageKey(name), JSON.stringify(seed));
+  } catch (e) {
+    _memoryStore[name] = seed;
+  }
   return seed;
 }
 
