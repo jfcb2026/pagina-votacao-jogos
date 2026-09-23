@@ -3,8 +3,20 @@ initPage("passeios.html");
 let eventos = loadStore("eventos");
 let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let colunas = loadStore("colunasEventos");
+let editingLink = {};
+
+function normalizeLinkUrl(valor) {
+  const v = (valor || "").trim();
+  if (!v) return v;
+  return /^https?:\/\//i.test(v) ? v : "https://" + v;
+}
 
 function persist() { saveStore("eventos", eventos); }
+
+function linkColId() {
+  const c = colunas.find(isLinkCol);
+  return c ? c.id : "link";
+}
 
 (function garantirColunaDescricao() {
   let mudou = false;
@@ -49,8 +61,23 @@ function totalAderentes(ev) {
   return Object.values(ev.respostas || {}).filter(v => v === "adere").length;
 }
 
-function fieldHtml(c, ev) {
+function isLinkCol(c) {
+  return c.id === "link" || (c.label || "").trim().toLowerCase() === "link";
+}
+
+function fieldHtml(c, ev, idx) {
   const val = ev[c.id] ?? "";
+  if (isLinkCol(c)) {
+    if (editingLink[idx] || !val) {
+      return `<input type="text" class="link-input" data-field="${c.id}" data-idx="${idx}" value="${escapeHtml(val)}" placeholder="Cola aqui o link">`;
+    }
+    return `
+      <div class="link-cell">
+        <button type="button" class="small link-open-btn" data-idx="${idx}">Abrir Link${EXTERNAL_LINK_ICON}</button>
+        <button type="button" class="icon-btn link-edit-btn" data-idx="${idx}" title="Editar link">${EDIT_ICON}</button>
+      </div>
+    `;
+  }
   if (c.type === "textarea") return `<textarea rows="2" data-field="${c.id}">${escapeHtml(val)}</textarea>`;
   return `<input type="text" data-field="${c.id}" value="${escapeHtml(val)}">`;
 }
@@ -62,7 +89,7 @@ function render() {
     if (!ev.respostas) ev.respostas = {};
     return `
       <tr data-idx="${i}">
-        ${colunas.map(c => `<td>${fieldHtml(c, ev)}</td>`).join("")}
+        ${colunas.map(c => `<td>${fieldHtml(c, ev, i)}</td>`).join("")}
         ${membros.map(m => {
           const resposta = ev.respostas[m] || "";
           return `
@@ -90,6 +117,36 @@ function render() {
       const idx = Number(field.closest("tr").dataset.idx);
       eventos[idx][field.dataset.field] = field.value;
       persist();
+    });
+  });
+
+  body.querySelectorAll(".link-input").forEach(input => {
+    function sair() {
+      const idx = Number(input.dataset.idx);
+      if ((eventos[idx][linkColId()] || "").trim()) {
+        delete editingLink[idx];
+        render();
+      }
+    }
+    input.addEventListener("blur", sair);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") input.blur(); });
+  });
+
+  body.querySelectorAll(".link-open-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      const url = normalizeLinkUrl(eventos[idx][linkColId()]);
+      if (url) window.open(url, "_blank", "noopener");
+    });
+  });
+
+  body.querySelectorAll(".link-edit-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.dataset.idx);
+      editingLink[idx] = true;
+      render();
+      const input = body.querySelector(`.link-input[data-idx="${idx}"]`);
+      if (input) input.focus();
     });
   });
 
