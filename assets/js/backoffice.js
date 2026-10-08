@@ -149,6 +149,33 @@ function renderThemes() {
 
 renderThemes();
 
+function renderSeasonalTheme() {
+  const activo = getActiveSeasonalTheme();
+  const wrap = document.getElementById("seasonal-theme-options");
+  wrap.innerHTML = `
+    <div class="theme-grid">
+      ${SEASONAL_THEMES.map(t => `
+        <button type="button" class="theme-swatch theme-swatch-center ${t.id === activo ? "active" : ""}" data-season-id="${t.id}">
+          <span class="theme-swatch-label">
+            <strong>${t.icon ? t.icon + " " : ""}${escapeHtml(t.label)}</strong>
+          </span>
+        </button>
+      `).join("")}
+    </div>
+  `;
+
+  wrap.querySelectorAll(".theme-swatch").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.seasonId;
+      saveStore("temaSazonal", id);
+      applySeasonalTheme(id);
+      renderSeasonalTheme();
+    });
+  });
+}
+
+renderSeasonalTheme();
+
 document.getElementById("save-password-btn").addEventListener("click", async () => {
   const oldInput = document.getElementById("old-password");
   const newInput = document.getElementById("new-password");

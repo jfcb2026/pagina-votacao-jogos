@@ -83,6 +83,7 @@ const DEFAULT_DATA = {
   horarioJogo: "21h",
   diaSemanaJogo: 4,
   tema: "midnight",
+  temaSazonal: "nenhum",
   nomeSite: "Página De Jogos De Amigos",
 };
 
@@ -116,6 +117,26 @@ function applyTheme(themeId) {
 }
 
 applyTheme();
+
+const SEASONAL_THEMES = [
+  { id: "nenhum", label: "Nenhum", icon: "" },
+  { id: "halloween", label: "Halloween", icon: "🎃" },
+];
+
+function getActiveSeasonalTheme() {
+  return loadStore("temaSazonal") || "nenhum";
+}
+
+function applySeasonalTheme(temaId) {
+  const tema = temaId || getActiveSeasonalTheme();
+  if (tema && tema !== "nenhum") {
+    document.documentElement.setAttribute("data-season", tema);
+  } else {
+    document.documentElement.removeAttribute("data-season");
+  }
+}
+
+applySeasonalTheme();
 
 const WEEKDAY_NAMES = [
   "Domingo", "Segunda-Feira", "Terça-Feira", "Quarta-Feira",
@@ -182,7 +203,7 @@ const CLOUD_SYNC_KEYS = [
   "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos", "links",
   "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos", "colunasLinks",
   "votacaoSemanal", "historicoVencedores", "votacaoDia", "diaSemanaJogo", "horarioJogo",
-  "nomeSite", "passwordOverride",
+  "nomeSite", "passwordOverride", "temaSazonal",
 ];
 
 let _cloudReady = false;
@@ -211,6 +232,7 @@ function watchCloudKey(name) {
     const remote = snap.data();
     if (remote.updatedAt && remote.updatedAt === _lastPushedAt[name]) return;
     localStorage.setItem(storageKey(name), JSON.stringify(remote.value));
+    if (name === "temaSazonal") applySeasonalTheme(remote.value);
     refreshFromCloud();
   }, () => { });
 }
