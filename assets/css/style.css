@@ -1105,3 +1105,20 @@ table input[type="text"], table input[type="date"], table select, table textarea
     animation: none;
   }
 }
+
+
+.table-scroll.freeze-panes { overflow: auto; }
+.freeze-panes table { border-collapse: separate; border-spacing: 0; }
+.freeze-panes thead th { position: sticky; top: 0; z-index: 2; }
+.freeze-panes thead th:first-child {
+  left: 0;
+  z-index: 3;
+  border-right: 1px solid var(--border);
+}
+.freeze-panes tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+}

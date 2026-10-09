@@ -455,6 +455,31 @@ function initPage(activeHref) {
   } else {
     renderHeader(activeHref);
   }
+  initFreezePanes();
+}
+
+function updateFreezePanesHeight() {
+  document.querySelectorAll(".table-scroll.freeze-panes").forEach(el => {
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const h = Math.max(260, Math.round(window.innerHeight - top - 40));
+    const atual = parseInt(el.style.maxHeight, 10);
+    if (atual !== h) el.style.maxHeight = h + "px";
+  });
+}
+
+function initFreezePanes() {
+  if (!document.querySelector(".table-scroll.freeze-panes")) return;
+  updateFreezePanesHeight();
+  window.addEventListener("resize", updateFreezePanesHeight);
+  window.addEventListener("load", updateFreezePanesHeight);
+  if (typeof ResizeObserver !== "undefined") {
+    let pendente = false;
+    new ResizeObserver(() => {
+      if (pendente) return;
+      pendente = true;
+      requestAnimationFrame(() => { pendente = false; updateFreezePanesHeight(); });
+    }).observe(document.querySelector("main"));
+  }
 }
 
 const TRASH_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>';
