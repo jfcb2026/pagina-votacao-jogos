@@ -1122,3 +1122,12 @@ table input[type="text"], table input[type="date"], table select, table textarea
   background: var(--card);
   border-right: 1px solid var(--border);
 }
+
+@media (hover: hover) {
+  tbody tr:hover td {
+    background: color-mix(in srgb, var(--accent) 14%, var(--card));
+  }
+  .freeze-panes tbody tr:hover td:first-child {
+    background: color-mix(in srgb, var(--accent) 14%, var(--card));
+  }
+}
