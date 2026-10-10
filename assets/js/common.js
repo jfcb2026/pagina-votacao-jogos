@@ -120,7 +120,7 @@ function applyTheme(themeId) {
 applyTheme();
 
 const SEASONAL_THEMES = [
-  { id: "nenhum", label: "Nenhum", icon: "" },
+  { id: "nenhum", label: "Nenhum", icon: "🚫" },
   {
     id: "halloween",
     label: "Halloween",
