@@ -193,7 +193,7 @@ function renderSeasonalMusic() {
       ${opcoes.map(o => `
         <button type="button" class="theme-swatch theme-swatch-center ${o.id === activa || (o.id === "nenhuma" && !escolhida) ? "active" : ""}" data-music-id="${o.id}">
           <span class="theme-swatch-label">
-            <strong>${o.id === "nenhuma" ? "" : "♪ "}${escapeHtml(o.title)}</strong>
+            <strong>${o.id === "nenhuma" ? "🔇 " : "♪ "}${escapeHtml(o.title)}</strong>
           </span>
         </button>
       `).join("")}
