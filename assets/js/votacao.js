@@ -4,10 +4,31 @@ let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let jogosHabituais = loadStore("jogosHabituais");
 let jogosNaoJogados = loadStore("jogosNaoJogados");
 let votacao = loadStore("votacaoSemanal");
-if (typeof votacao.validado !== "boolean") votacao.validado = false;
-if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
-if (typeof votacao.vencedorSorteado === "undefined") votacao.vencedorSorteado = null;
-if (!votacao.naoVouJogar) votacao.naoVouJogar = {};
+
+function normalizarVotacao() {
+  if (typeof votacao.validado !== "boolean") votacao.validado = false;
+  if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
+  if (typeof votacao.vencedorSorteado === "undefined") votacao.vencedorSorteado = null;
+  if (!votacao.naoVouJogar) votacao.naoVouJogar = {};
+}
+
+normalizarVotacao();
+
+function reloadFromStore() {
+  membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
+  jogosHabituais = loadStore("jogosHabituais");
+  jogosNaoJogados = loadStore("jogosNaoJogados");
+  votacao = loadStore("votacaoSemanal");
+  normalizarVotacao();
+}
+
+function persistMerged(fn) {
+  saveStoreMerged("votacaoSemanal", votacao, remoto => {
+    if (!remoto.votos) remoto.votos = {};
+    if (!remoto.naoVouJogar) remoto.naoVouJogar = {};
+    fn(remoto);
+  });
+}
 
 (function renderDiaJogoLabel() {
   const dataLabel = nextGameDateLabel(loadStore("diaSemanaJogo"));
@@ -135,8 +156,9 @@ function render() {
   body.querySelectorAll(".toggle-jogar-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const m = btn.dataset.membro;
-      votacao.naoVouJogar[m] = !votacao.naoVouJogar[m];
-      persist();
+      const naoVai = !votacao.naoVouJogar[m];
+      votacao.naoVouJogar[m] = naoVai;
+      persistMerged(remoto => { remoto.naoVouJogar[m] = naoVai; });
       render();
     });
   });
@@ -144,8 +166,13 @@ function render() {
   body.querySelectorAll("select").forEach(sel => {
     sel.addEventListener("change", () => {
       const m = sel.dataset.membro, i = Number(sel.dataset.idx);
-      votacao.votos[m][i] = sel.value;
-      persist();
+      const escolhido = sel.value;
+      votacao.votos[m][i] = escolhido;
+      persistMerged(remoto => {
+        if (!Array.isArray(remoto.votos[m])) remoto.votos[m] = [];
+        while (remoto.votos[m].length <= i) remoto.votos[m].push("");
+        remoto.votos[m][i] = escolhido;
+      });
       render();
       if (sel.value) {
         showVotoFeedback(i);

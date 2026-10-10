@@ -210,17 +210,68 @@ let _cloudReady = false;
 
 const _lastPushedAt = {};
 
+const _ownTimestamps = {};
+
+function registerOwnTimestamp(name, ts) {
+  _lastPushedAt[name] = ts;
+  const lista = _ownTimestamps[name] || (_ownTimestamps[name] = []);
+  lista.push(ts);
+  if (lista.length > 30) lista.shift();
+}
+
+function isOwnTimestamp(name, ts) {
+  const lista = _ownTimestamps[name];
+  return !!lista && lista.includes(ts);
+}
+
 function pushToCloud(name, data) {
   if (!CLOUD_SYNC_KEYS.includes(name)) return;
   if (!_cloudReady || typeof firebase === "undefined") return;
   const ts = Date.now();
-  _lastPushedAt[name] = ts;
+  registerOwnTimestamp(name, ts);
   firebase.firestore().collection("jogosAmigos").doc(name)
     .set({ value: data, updatedAt: ts })
     .catch(() => { });
 }
 
+const _mergeInflight = {};
+
+function saveStoreMerged(name, data, mutator) {
+  try {
+    localStorage.setItem(storageKey(name), JSON.stringify(data));
+  } catch (e) {
+    _memoryStore[name] = data;
+  }
+  if (!CLOUD_SYNC_KEYS.includes(name)) return;
+  if (!_cloudReady || typeof firebase === "undefined") return;
+  const db = firebase.firestore();
+  const ref = db.collection("jogosAmigos").doc(name);
+  const ts = Date.now();
+  registerOwnTimestamp(name, ts);
+  _mergeInflight[name] = (_mergeInflight[name] || 0) + 1;
+  db.runTransaction(tx => tx.get(ref).then(snap => {
+    const merged = snap.exists ? snap.data().value : JSON.parse(JSON.stringify(data));
+    mutator(merged);
+    tx.set(ref, { value: merged, updatedAt: ts });
+    return merged;
+  })).then(merged => {
+    _mergeInflight[name]--;
+    if (_mergeInflight[name] > 0) return;
+    const json = JSON.stringify(merged);
+    let atual = null;
+    try { atual = localStorage.getItem(storageKey(name)); } catch (e) { }
+    if (json !== atual) {
+      try { localStorage.setItem(storageKey(name), json); } catch (e) { _memoryStore[name] = merged; }
+      refreshFromCloud();
+    }
+  }).catch(() => {
+    _mergeInflight[name]--;
+    pushToCloud(name, data);
+  });
+}
+
 function refreshFromCloud() {
+  if (typeof reloadFromStore === "function") { try { reloadFromStore(); } catch (e) { } }
   if (typeof render === "function") { try { render(); } catch (e) { } }
 }
 
@@ -229,8 +280,9 @@ const _cloudUnsubscribers = {};
 function watchCloudKey(name) {
   _cloudUnsubscribers[name] = firebase.firestore().collection("jogosAmigos").doc(name).onSnapshot(snap => {
     if (!snap.exists) return;
+    if (snap.metadata && snap.metadata.hasPendingWrites) return;
     const remote = snap.data();
-    if (remote.updatedAt && remote.updatedAt === _lastPushedAt[name]) return;
+    if (remote.updatedAt && isOwnTimestamp(name, remote.updatedAt)) return;
     localStorage.setItem(storageKey(name), JSON.stringify(remote.value));
     if (name === "temaSazonal") applySeasonalTheme(remote.value);
     refreshFromCloud();

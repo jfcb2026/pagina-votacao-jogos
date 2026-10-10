@@ -2,8 +2,19 @@ initPage("votacao-dia.html");
 
 let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let votacaoDia = loadStore("votacaoDia");
-if (!votacaoDia.voto) votacaoDia.voto = {};
-if (typeof votacaoDia.aplicado !== "boolean") votacaoDia.aplicado = false;
+
+function normalizarVotacaoDia() {
+  if (!votacaoDia.voto) votacaoDia.voto = {};
+  if (typeof votacaoDia.aplicado !== "boolean") votacaoDia.aplicado = false;
+}
+
+normalizarVotacaoDia();
+
+function reloadFromStore() {
+  membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
+  votacaoDia = loadStore("votacaoDia");
+  normalizarVotacaoDia();
+}
 
 const DIAS = ["2f", "3f", "4f", "5f", "6f"];
 const DIAS_LABEL = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
@@ -70,8 +81,14 @@ function render() {
   body.querySelectorAll("input[type=checkbox]").forEach(cb => {
     cb.addEventListener("change", () => {
       const m = cb.dataset.membro, i = Number(cb.dataset.idx);
-      votacaoDia.voto[m][i] = cb.checked;
-      persist();
+      const marcado = cb.checked;
+      votacaoDia.voto[m][i] = marcado;
+      saveStoreMerged("votacaoDia", votacaoDia, remoto => {
+        if (!remoto.voto) remoto.voto = {};
+        if (!Array.isArray(remoto.voto[m])) remoto.voto[m] = [];
+        while (remoto.voto[m].length < DIAS.length) remoto.voto[m].push(false);
+        remoto.voto[m][i] = marcado;
+      });
       renderTotals();
       renderResultadoDia();
     });

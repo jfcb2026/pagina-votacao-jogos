@@ -7,6 +7,12 @@ let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let colunas = loadStore("colunasNaoJogados");
 let editingLink = {};
 
+function reloadFromStore() {
+  jogos = loadStore("jogosNaoJogados");
+  membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
+  colunas = loadStore("colunasNaoJogados");
+}
+
 function persist() { saveStore("jogosNaoJogados", jogos); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }

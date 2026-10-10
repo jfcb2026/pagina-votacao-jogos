@@ -5,6 +5,11 @@ document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICO
 let jogos = loadStore("jogosHabituais");
 let colunas = loadStore("colunasHabituais");
 
+function reloadFromStore() {
+  jogos = loadStore("jogosHabituais");
+  colunas = loadStore("colunasHabituais");
+}
+
 function persist() { saveStore("jogosHabituais", jogos); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }

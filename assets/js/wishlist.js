@@ -7,6 +7,12 @@ let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
 let colunas = loadStore("colunasWishlist");
 let editingLink = {};
 
+function reloadFromStore() {
+  jogos = loadStore("wishlist");
+  membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
+  colunas = loadStore("colunasWishlist");
+}
+
 function normalizeLinkUrl(valor) {
   const v = (valor || "").trim();
   if (!v) return v;

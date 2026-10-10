@@ -5,6 +5,11 @@ document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICO
 let links = loadStore("links");
 let colunas = loadStore("colunasLinks");
 
+function reloadFromStore() {
+  links = loadStore("links");
+  colunas = loadStore("colunasLinks");
+}
+
 function persist() { saveStore("links", links); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }
