@@ -169,7 +169,43 @@ function renderSeasonalTheme() {
       const id = btn.dataset.seasonId;
       saveStore("temaSazonal", id);
       applySeasonalTheme(id);
+      updateSeasonalMusic();
       renderSeasonalTheme();
+    });
+  });
+
+  renderSeasonalMusic();
+}
+
+function renderSeasonalMusic() {
+  const wrap = document.getElementById("seasonal-music-options");
+  const tema = SEASONAL_THEMES.find(t => t.id === getActiveSeasonalTheme());
+  if (!tema || !tema.tracks || !tema.tracks.length) {
+    wrap.innerHTML = "";
+    return;
+  }
+  const activa = loadStore("musicaSazonal");
+  const opcoes = [{ id: "nenhuma", title: "Sem música" }].concat(tema.tracks);
+  const escolhida = tema.tracks.find(t => t.id === activa);
+  wrap.innerHTML = `
+    <h3 class="theme-group-title">Música</h3>
+    <div class="theme-grid">
+      ${opcoes.map(o => `
+        <button type="button" class="theme-swatch theme-swatch-center ${o.id === activa || (o.id === "nenhuma" && !escolhida) ? "active" : ""}" data-music-id="${o.id}">
+          <span class="theme-swatch-label">
+            <strong>${o.id === "nenhuma" ? "" : "♪ "}${escapeHtml(o.title)}</strong>
+          </span>
+        </button>
+      `).join("")}
+    </div>
+    <p class="hint">A música só começa depois de cada pessoa carregar no botão do leitor (canto inferior direito) e pode ser silenciada a qualquer momento.</p>
+  `;
+
+  wrap.querySelectorAll(".theme-swatch").forEach(btn => {
+    btn.addEventListener("click", () => {
+      saveStore("musicaSazonal", btn.dataset.musicId);
+      updateSeasonalMusic();
+      renderSeasonalMusic();
     });
   });
 }

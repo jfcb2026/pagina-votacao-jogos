@@ -1131,3 +1131,57 @@ table input[type="text"], table input[type="date"], table select, table textarea
     background: color-mix(in srgb, var(--accent) 14%, var(--card));
   }
 }
+
+#seasonal-music-options { margin-top: 18px; }
+
+body.has-season-player { padding-bottom: 64px; }
+
+.season-player {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 5px 14px 5px 5px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--text-dim);
+}
+
+.season-player-btn {
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-alt);
+}
+
+.season-player-btn svg { display: block; }
+
+.season-player-credit a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--text-dim);
+}
+
+.season-player-credit a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+#seasonal-music-options .hint a { color: var(--accent); }
+
+@media (max-width: 560px) {
+  .season-player { border-radius: 18px; }
+}

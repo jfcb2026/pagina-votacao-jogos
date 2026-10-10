@@ -84,6 +84,7 @@ const DEFAULT_DATA = {
   diaSemanaJogo: 4,
   tema: "midnight",
   temaSazonal: "nenhum",
+  musicaSazonal: "nenhuma",
   nomeSite: "Página De Jogos De Amigos",
 };
 
@@ -120,7 +121,23 @@ applyTheme();
 
 const SEASONAL_THEMES = [
   { id: "nenhum", label: "Nenhum", icon: "" },
-  { id: "halloween", label: "Halloween", icon: "🎃" },
+  {
+    id: "halloween",
+    label: "Halloween",
+    icon: "🎃",
+    tracks: [
+      {
+        id: "wtf-ghost",
+        title: "WTF! Ghost!",
+        author: "Alexandr Zhelanov",
+        file: "assets/audio/halloween/wtf-ghost.mp3",
+        sourceUrl: "https://opengameart.org/content/wtf-ghost",
+        authorUrl: "https://soundcloud.com/alexandr-zhelanov",
+        license: "CC BY 3.0",
+        licenseUrl: "https://creativecommons.org/licenses/by/3.0/",
+      },
+    ],
+  },
 ];
 
 function getActiveSeasonalTheme() {
@@ -203,7 +220,7 @@ const CLOUD_SYNC_KEYS = [
   "membros", "jogosHabituais", "jogosNaoJogados", "wishlist", "eventos", "links",
   "colunasHabituais", "colunasNaoJogados", "colunasWishlist", "colunasEventos", "colunasLinks",
   "votacaoSemanal", "historicoVencedores", "votacaoDia", "diaSemanaJogo", "horarioJogo",
-  "nomeSite", "passwordOverride", "temaSazonal",
+  "nomeSite", "passwordOverride", "temaSazonal", "musicaSazonal",
 ];
 
 let _cloudReady = false;
@@ -285,6 +302,7 @@ function watchCloudKey(name) {
     if (remote.updatedAt && isOwnTimestamp(name, remote.updatedAt)) return;
     localStorage.setItem(storageKey(name), JSON.stringify(remote.value));
     if (name === "temaSazonal") applySeasonalTheme(remote.value);
+    if (name === "temaSazonal" || name === "musicaSazonal") updateSeasonalMusic();
     refreshFromCloud();
   }, () => { });
 }
@@ -500,6 +518,115 @@ function renderBackofficeHeader() {
   document.body.prepend(header);
 }
 
+function localPrefGet(chave) {
+  try { return localStorage.getItem("jogosAmigos_local_" + chave); } catch (e) { return null; }
+}
+
+function localPrefSet(chave, valor) {
+  try { localStorage.setItem("jogosAmigos_local_" + chave, valor); } catch (e) { }
+}
+
+let _seasonAudio = null;
+let _seasonTrackId = null;
+let _seasonPlayerEl = null;
+let _seasonPosBound = false;
+
+function getSeasonalTrack() {
+  const tema = SEASONAL_THEMES.find(t => t.id === getActiveSeasonalTheme());
+  if (!tema || !tema.tracks) return null;
+  const id = loadStore("musicaSazonal");
+  return tema.tracks.find(t => t.id === id) || null;
+}
+
+function seasonalCreditHtml(track) {
+  const link = (url, texto) => `<a href="${escapeHtml(url)}" target="_blank" rel="noopener">${escapeHtml(texto)}</a>`;
+  return `♪ ${link(track.sourceUrl, track.title)} · ${link(track.authorUrl, track.author)} · ${link(track.licenseUrl, track.license)}`;
+}
+
+function saveSeasonalPos() {
+  if (!_seasonAudio || !_seasonTrackId) return;
+  localPrefSet("musicaPos", JSON.stringify({
+    id: _seasonTrackId,
+    t: _seasonAudio.currentTime,
+    at: Date.now(),
+    tocava: !_seasonAudio.paused,
+  }));
+}
+
+function setSeasonalPlayerState(aTocar) {
+  if (!_seasonPlayerEl) return;
+  const btn = _seasonPlayerEl.querySelector(".season-player-btn");
+  const texto = aTocar ? "Silenciar música" : "Ativar música";
+  btn.innerHTML = aTocar ? VOLUME_ICON : VOLUME_X_ICON;
+  btn.setAttribute("aria-label", texto);
+  btn.setAttribute("aria-pressed", aTocar ? "true" : "false");
+  btn.title = texto;
+}
+
+function removeSeasonalPlayer() {
+  if (_seasonAudio) { try { _seasonAudio.pause(); } catch (e) { } }
+  if (_seasonPlayerEl) _seasonPlayerEl.remove();
+  document.body.classList.remove("has-season-player");
+  _seasonAudio = null;
+  _seasonTrackId = null;
+  _seasonPlayerEl = null;
+}
+
+function updateSeasonalMusic() {
+  const track = getSeasonalTrack();
+  if (!track) { removeSeasonalPlayer(); return; }
+  if (_seasonTrackId === track.id && _seasonPlayerEl && document.body.contains(_seasonPlayerEl)) return;
+
+  removeSeasonalPlayer();
+  _seasonTrackId = track.id;
+
+  const audio = new Audio(track.file);
+  audio.loop = true;
+  audio.volume = 0.3;
+  audio.preload = "metadata";
+  _seasonAudio = audio;
+
+  const el = document.createElement("div");
+  el.className = "season-player";
+  el.innerHTML = `<button type="button" class="season-player-btn"></button><span class="season-player-credit">${seasonalCreditHtml(track)}</span>`;
+  document.body.appendChild(el);
+  document.body.classList.add("has-season-player");
+  _seasonPlayerEl = el;
+  setSeasonalPlayerState(false);
+
+  audio.addEventListener("play", () => setSeasonalPlayerState(true));
+  audio.addEventListener("pause", () => setSeasonalPlayerState(false));
+
+  el.querySelector(".season-player-btn").addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play().then(() => localPrefSet("musicaLigada", "1")).catch(() => { });
+    } else {
+      audio.pause();
+      localPrefSet("musicaLigada", "0");
+    }
+  });
+
+  if (localPrefGet("musicaLigada") === "1") {
+    let pos = null;
+    try { pos = JSON.parse(localPrefGet("musicaPos")); } catch (e) { }
+    const iniciar = () => {
+      if (pos && pos.id === track.id && isFinite(audio.duration) && audio.duration > 0) {
+        const extra = pos.tocava ? (Date.now() - pos.at) / 1000 : 0;
+        audio.currentTime = (pos.t + extra) % audio.duration;
+      }
+      audio.play().catch(() => { });
+    };
+    if (audio.readyState >= 1) iniciar();
+    else audio.addEventListener("loadedmetadata", iniciar, { once: true });
+  }
+
+  if (!_seasonPosBound) {
+    _seasonPosBound = true;
+    window.addEventListener("pagehide", saveSeasonalPos);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) saveSeasonalPos(); });
+  }
+}
+
 function initPage(activeHref) {
   requireAuth();
   if (activeHref === "backoffice.html") {
@@ -508,6 +635,7 @@ function initPage(activeHref) {
     renderHeader(activeHref);
   }
   initFreezePanes();
+  updateSeasonalMusic();
 }
 
 function updateFreezePanesHeight() {
@@ -568,6 +696,10 @@ const DICE_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" widt
 const CLOUD_UPLOAD_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path><polyline points="12 12 12 21"></polyline><polyline points="9 15 12 12 15 15"></polyline></svg>';
 const STOP_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6" fill="currentColor" stroke="none"></rect></svg>';
 const EXTERNAL_LINK_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>';
+const VOLUME_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>';
+
+const VOLUME_X_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>';
+
 const EDIT_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>';
 
 const X_ICON = '<svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>';
