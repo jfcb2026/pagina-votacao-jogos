@@ -74,6 +74,10 @@ function defaultColWidth(c) {
   return "200px";
 }
 
+function membrosVisiveis() {
+  return filterVisibleMembers(membros);
+}
+
 function renderHead() {
   const table = document.getElementById("eventos-table");
   let colgroup = table.querySelector("colgroup");
@@ -82,12 +86,12 @@ function renderHead() {
     table.insertBefore(colgroup, table.firstChild);
   }
   colgroup.innerHTML = colunas.map(c => `<col style="width:${defaultColWidth(c)}">`).join("") +
-    membros.map(() => `<col style="width:90px">`).join("") +
+    membrosVisiveis().map(() => `<col style="width:90px">`).join("") +
     `<col style="width:140px"><col class="col-actions" style="width:110px">`;
 
   document.getElementById("table-head").innerHTML =
     colunas.map(c => `<th>${escapeHtml(c.label)}</th>`).join("") +
-    membros.map(m => `<th class="text-center">${escapeHtml(m)}</th>`).join("") +
+    membrosVisiveis().map(m => `<th class="text-center">${escapeHtml(m)}</th>`).join("") +
     `<th class="text-center">Total Aderentes</th>` +
     `<th class="col-actions"></th>`;
 }
@@ -118,6 +122,7 @@ function fieldHtml(c, ev, idx) {
 }
 
 function render() {
+  renderMemberViewSelect(membros);
   renderHead();
   const body = document.getElementById("table-body");
   body.innerHTML = eventos.map((ev, i) => {
@@ -125,7 +130,7 @@ function render() {
     return `
       <tr data-idx="${i}">
         ${colunas.map(c => `<td>${fieldHtml(c, ev, i)}</td>`).join("")}
-        ${membros.map(m => {
+        ${membrosVisiveis().map(m => {
           const resposta = ev.respostas[m] || "";
           return `
             <td class="text-center">
@@ -218,7 +223,9 @@ function render() {
     });
   });
 
-  initColumnResize(document.getElementById("eventos-table"), "colWidthsEventos");
+  initColumnResize(document.getElementById("eventos-table"), memberViewWidthsKey("colWidthsEventos", membros));
+
+  applyMemberViewTableWidth(document.getElementById("eventos-table"), membros);
 }
 
 document.getElementById("add-evento-btn").addEventListener("click", () => {

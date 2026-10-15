@@ -1,6 +1,5 @@
 initPage("jogos-habituais.html");
 
-document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICON}`;
 
 let jogos = loadStore("jogosHabituais");
 let colunas = loadStore("colunasHabituais");
@@ -14,9 +13,8 @@ function persist() { saveStore("jogosHabituais", jogos); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }
 
-function updateHint() {
-  document.getElementById("import-hint").textContent =
-    `A importação de Excel acrescenta jogos novos e atualiza os existentes (por "${coreCol().label}"), sem apagar os restantes. Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
+function importHintText() {
+  return     `A importação de Excel acrescenta jogos novos e atualiza os existentes (por "${coreCol().label}"), sem apagar os restantes. Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
 }
 
 function renderHead() {
@@ -37,7 +35,6 @@ function renderHead() {
 function render() {
   const core = coreCol();
   jogos.sort((a, b) => String(a[core.id] ?? "").localeCompare(String(b[core.id] ?? ""), "pt", { sensitivity: "base" }));
-  updateHint();
   renderHead();
   const body = document.getElementById("table-body");
   body.innerHTML = jogos.map((j, i) => `
@@ -77,6 +74,7 @@ document.getElementById("add-jogo-btn").addEventListener("click", () => {
     title: "Novo Jogo",
     fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
     submitLabel: "Adicionar",
+    importar: { hint: importHintText(), onClick: () => document.getElementById("import-input").click() },
     onSubmit: dados => {
       const novo = {};
       colunas.forEach(c => novo[c.id] = dados[c.id] || "");
@@ -87,13 +85,11 @@ document.getElementById("add-jogo-btn").addEventListener("click", () => {
   });
 });
 
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-input").click();
-});
 
 document.getElementById("import-input").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
+  closeAllModals();
   readExcelFile(file, rows => {
     const core = coreCol();
     rows.forEach(row => {

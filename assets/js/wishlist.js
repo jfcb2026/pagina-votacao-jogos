@@ -1,6 +1,5 @@
 initPage("wishlist.html");
 
-document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICON}`;
 
 let jogos = loadStore("wishlist");
 let membros = loadStore("membros").sort((a, b) => a.localeCompare(b, "pt"));
@@ -41,9 +40,8 @@ function persist() { saveStore("wishlist", jogos); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }
 
-function updateHint() {
-  document.getElementById("import-hint").textContent =
-    `A importação de Excel acrescenta jogos novos e atualiza os existentes (por "${coreCol().label}"). Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
+function importHintText() {
+  return     `A importação de Excel acrescenta jogos novos e atualiza os existentes (por "${coreCol().label}"). Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
 }
 
 function countReactions(reacoes) {
@@ -54,6 +52,10 @@ function countReactions(reacoes) {
   };
 }
 
+function membrosVisiveis() {
+  return filterVisibleMembers(membros);
+}
+
 function renderHead() {
   const table = document.getElementById("wishlist-table");
   let colgroup = table.querySelector("colgroup");
@@ -62,19 +64,19 @@ function renderHead() {
     table.insertBefore(colgroup, table.firstChild);
   }
   colgroup.innerHTML = colunas.map(() => `<col style="width:220px">`).join("") +
-    membros.map(() => `<col style="width:110px">`).join("") +
+    membrosVisiveis().map(() => `<col style="width:110px">`).join("") +
     `<col style="width:130px"><col class="col-actions" style="width:290px">`;
 
   document.getElementById("table-head").innerHTML =
     colunas.map(c => `<th>${escapeHtml(c.label)}</th>`).join("") +
-    membros.map(m => `<th class="text-center">${escapeHtml(m)}</th>`).join("") +
+    membrosVisiveis().map(m => `<th class="text-center">${escapeHtml(m)}</th>`).join("") +
     `<th class="text-center">Votação</th><th class="col-actions"></th>`;
 }
 
 function render() {
   const core = coreCol();
   jogos.sort((a, b) => String(a[core.id] ?? "").localeCompare(String(b[core.id] ?? ""), "pt", { sensitivity: "base" }));
-  updateHint();
+  renderMemberViewSelect(membros);
   renderHead();
   const body = document.getElementById("table-body");
   body.innerHTML = jogos.map((j, i) => {
@@ -83,7 +85,7 @@ function render() {
     return `
       <tr data-idx="${i}">
         ${colunas.map(c => renderColCell(c, j, i)).join("")}
-        ${membros.map(m => {
+        ${membrosVisiveis().map(m => {
           const reacao = j.reacoes[m] || "";
           return `
             <td>
@@ -185,7 +187,9 @@ function render() {
     });
   });
 
-  initColumnResize(document.getElementById("wishlist-table"), "colWidthsWishlistV2");
+  initColumnResize(document.getElementById("wishlist-table"), memberViewWidthsKey("colWidthsWishlistV2", membros));
+
+  applyMemberViewTableWidth(document.getElementById("wishlist-table"), membros);
 }
 
 document.getElementById("add-jogo-btn").addEventListener("click", () => {
@@ -193,6 +197,7 @@ document.getElementById("add-jogo-btn").addEventListener("click", () => {
     title: "Novo Jogo",
     fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
     submitLabel: "Adicionar",
+    importar: { hint: importHintText(), onClick: () => document.getElementById("import-input").click() },
     onSubmit: dados => {
       const novo = { reacoes: {} };
       colunas.forEach(c => novo[c.id] = dados[c.id] || "");
@@ -203,13 +208,11 @@ document.getElementById("add-jogo-btn").addEventListener("click", () => {
   });
 });
 
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-input").click();
-});
 
 document.getElementById("import-input").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
+  closeAllModals();
   readExcelFile(file, rows => {
     const core = coreCol();
     rows.forEach(row => {

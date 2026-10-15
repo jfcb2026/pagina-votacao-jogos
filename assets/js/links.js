@@ -1,6 +1,5 @@
 initPage("links.html");
 
-document.getElementById("import-btn").innerHTML = `Importar de Excel${IMPORT_ICON}`;
 
 let links = loadStore("links");
 let colunas = loadStore("colunasLinks");
@@ -14,9 +13,8 @@ function persist() { saveStore("links", links); }
 
 function coreCol() { return colunas.find(c => c.core) || colunas[0]; }
 
-function updateHint() {
-  document.getElementById("import-hint").textContent =
-    `A importação de Excel acrescenta links novos e atualiza os existentes (por "${coreCol().label}"). Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
+function importHintText() {
+  return     `A importação de Excel acrescenta links novos e atualiza os existentes (por "${coreCol().label}"). Usa estes cabeçalhos na 1ª linha da folha: ${colunas.map(c => c.label).join(", ")}.`;
 }
 
 function renderHead() {
@@ -35,7 +33,6 @@ function renderHead() {
 }
 
 function render() {
-  updateHint();
   renderHead();
   const body = document.getElementById("table-body");
   body.innerHTML = links.map((l, i) => `
@@ -82,6 +79,7 @@ document.getElementById("add-link-btn").addEventListener("click", () => {
     title: "Novo Link",
     fields: colunas.map(c => ({ id: c.id, label: c.label, required: c.core })),
     submitLabel: "Adicionar",
+    importar: { hint: importHintText(), onClick: () => document.getElementById("import-input").click() },
     onSubmit: dados => {
       const novo = {};
       colunas.forEach(c => novo[c.id] = dados[c.id] || "");
@@ -92,13 +90,11 @@ document.getElementById("add-link-btn").addEventListener("click", () => {
   });
 });
 
-document.getElementById("import-btn").addEventListener("click", () => {
-  document.getElementById("import-input").click();
-});
 
 document.getElementById("import-input").addEventListener("change", e => {
   const file = e.target.files[0];
   if (!file) return;
+  closeAllModals();
   readExcelFile(file, rows => {
     const core = coreCol();
     rows.forEach(row => {

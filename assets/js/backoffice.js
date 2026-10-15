@@ -238,6 +238,7 @@ function renderMembers() {
   const list = document.getElementById("member-list");
   list.innerHTML = membros.map((m, i) => `
     <span class="type-chip">
+      <button type="button" class="avatar-btn" data-idx="${i}" title="Escolher avatar" aria-label="Escolher avatar de ${escapeHtml(m)}">${avatarSvg(getAvatarId(m), 26)}</button>
       <input type="text" class="member-name-input" data-idx="${i}" value="${escapeHtml(m)}" style="border:none;background:transparent;color:inherit;width:120px;padding:0">
       <button class="remove-member-btn" data-idx="${i}">x</button>
     </span>
@@ -254,6 +255,16 @@ function renderMembers() {
       membros[idx] = newName;
       saveStore("membros", membros);
       renameMemberEverywhere(oldName, newName);
+    });
+  });
+
+  list.querySelectorAll(".avatar-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const nome = membros[Number(btn.dataset.idx)];
+      openAvatarPicker(nome, id => {
+        setAvatarId(nome, id);
+        renderMembers();
+      });
     });
   });
 

@@ -173,7 +173,7 @@ function renderRow(m) {
 
   return `
     <tr data-membro="${escapeHtml(m)}">
-      <td>${escapeHtml(m)}</td>
+      <td><span class="member-cell">${avatarSvg(getAvatarId(m), 26)}<span>${escapeHtml(m)}</span></span></td>
       ${gamesCellsHtml}
       ${actionCellHtml}
     </tr>

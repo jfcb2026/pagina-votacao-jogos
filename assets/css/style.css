@@ -1208,3 +1208,44 @@ body.has-season-player { padding-bottom: 64px; }
 }
 #dia-jogo-select { cursor: pointer; min-width: 160px; }
 #dia-jogo-select option { background: var(--card); color: var(--text); }
+
+.member-view-select,
+#desempate-select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.member-view-select { min-width: 190px; }
+.member-view-select option,
+.member-view-select optgroup,
+#desempate-select option { background: var(--card); color: var(--text); }
+
+.card-fit-table { width: fit-content; max-width: 100%; }
+.card-fit-table .hint { width: 0; min-width: 100%; }
+
+.modal-import { margin-top: 16px; }
+.modal-divider { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 0.8rem; margin-bottom: 10px; }
+.modal-divider::before, .modal-divider::after { content: ""; flex: 1; border-top: 1px solid var(--border); }
+.modal-import-title { margin: 0 0 4px; font-weight: 600; font-size: 0.9rem; }
+.modal-import .hint { margin: 0 0 10px; }
+.modal-import-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+.avatar-svg { display: block; border-radius: 50%; }
+.type-chip .avatar-btn { padding: 0; border: none; background: transparent; border-radius: 50%; display: inline-flex; cursor: pointer; flex: 0 0 auto; }
+.type-chip .avatar-btn:hover { box-shadow: 0 0 0 2px var(--accent); }
+.avatar-modal { max-width: 420px; }
+.avatar-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.avatar-option { padding: 4px; border-radius: 50%; border: 2px solid transparent; background: transparent; display: flex; justify-content: center; cursor: pointer; }
+.avatar-option:hover { border-color: var(--border); }
+.avatar-option.active { border-color: var(--accent); }
+.type-chip:has(.avatar-btn) { padding-left: 4px; }
+.member-cell { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.member-cell .avatar-svg { flex: 0 0 auto; }
+.avatar-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.avatar-tab { flex: 1; text-align: center; }
+.avatar-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.avatar-option.taken { filter: grayscale(1); opacity: 0.35; cursor: not-allowed; }
+.avatar-option.taken:hover { border-color: transparent; }
