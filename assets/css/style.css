@@ -1197,3 +1197,14 @@ body.has-season-player { padding-bottom: 64px; }
 .remember-hint:empty { display: none; }
 
 #horario-jogo-input { width: 95px; }
+
+.password-form input[type="password"],
+#dia-jogo-select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+#dia-jogo-select { cursor: pointer; min-width: 160px; }
+#dia-jogo-select option { background: var(--card); color: var(--text); }

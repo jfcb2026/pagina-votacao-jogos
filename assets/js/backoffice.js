@@ -634,5 +634,6 @@ document.querySelectorAll(".settings-nav-btn").forEach(btn => {
     btn.classList.add("active");
     const panel = document.querySelector(`.settings-panel[data-panel="${btn.dataset.target}"]`);
     if (panel) panel.hidden = false;
+    syncPasswordFieldWidths();
   });
 });

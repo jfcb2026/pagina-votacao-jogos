@@ -32,8 +32,8 @@
         <span>Jogos e Listas</span>
       </button>
       <button type="button" class="settings-nav-btn" data-target="nuvem">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path></svg>
-        <span>Dados e Nuvem</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9" cy="5" rx="7" ry="2.5"></ellipse><path d="M2 5v12c0 1.38 3.13 2.5 7 2.5"></path><path d="M16 5v5"></path><path d="M2 11c0 1.38 3.13 2.5 7 2.5"></path><rect x="13" y="15" width="9" height="7" rx="1.5"></rect><path d="M15 15v-2a2.5 2.5 0 0 1 5 0v2"></path></svg>
+        <span>Dados e Segurança</span>
       </button>
     </nav>
 
@@ -61,19 +61,6 @@
           <p class="hint">Camada decorativa opcional ligada a épocas do ano (não altera as cores do site). Fica visível para todo o grupo.</p>
           <div id="seasonal-theme-options"></div>
           <div id="seasonal-music-options"></div>
-        </div>
-
-        <div class="backoffice-section">
-          <h2>Password de Acesso</h2>
-          <p class="hint">Password partilhada usada para entrar no site.</p>
-          <div class="password-form">
-            <label for="old-password" class="sr-only">Password atual</label>
-            <input type="password" id="old-password" placeholder="Password atual" autocomplete="off">
-            <label for="new-password" class="sr-only">Nova password</label>
-            <input type="password" id="new-password" placeholder="Nova password" autocomplete="off">
-            <button class="primary" id="save-password-btn">Guardar Alterações</button>
-          </div>
-          <p class="hint" id="password-msg"></p>
         </div>
       </div>
 
@@ -234,6 +221,19 @@
           </div>
           <p class="hint" id="backup-msg"></p>
         </div>
+
+        <div class="backoffice-section">
+          <h2>Password de Acesso</h2>
+          <p class="hint">Password partilhada usada para entrar no site.</p>
+          <div class="password-form">
+            <label for="old-password" class="sr-only">Password atual</label>
+            <input type="password" id="old-password" placeholder="Password atual" autocomplete="off">
+            <label for="new-password" class="sr-only">Nova password</label>
+            <input type="password" id="new-password" placeholder="Nova password" autocomplete="off">
+            <button class="primary" id="save-password-btn">Guardar Alterações</button>
+          </div>
+          <p class="hint" id="password-msg"></p>
+        </div>
       </div>
     </div>
   </div>
@@ -243,6 +243,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/common.js?v=30"></script>
-<script src="assets/js/backoffice.js?v=22"></script>
+<script src="assets/js/backoffice.js?v=23"></script>
 </body>
 </html>
