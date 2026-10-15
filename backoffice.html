@@ -29,7 +29,7 @@
       </button>
       <button type="button" class="settings-nav-btn" data-target="jogos">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"></line><line x1="8" y1="9" x2="8" y2="13"></line><line x1="15" y1="12" x2="15.01" y2="12"></line><line x1="18" y1="10" x2="18.01" y2="10"></line><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"></path></svg>
-        <span>Jogos</span>
+        <span>Jogos e Listas</span>
       </button>
       <button type="button" class="settings-nav-btn" data-target="nuvem">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 18H6a4 4 0 0 1-1-7.87A5.5 5.5 0 0 1 15.9 6.34 4.5 4.5 0 0 1 19 15h0"></path></svg>
@@ -127,7 +127,7 @@
           <p class="hint">Lista de votações já fechadas, com o vencedor e a data em que a votação foi fechada. Remove entradas inválidas uma a uma, ou apaga tudo de uma vez.</p>
           <div id="historico-list" class="historico-list"></div>
           <div class="actions-row">
-            <button class="danger" id="clear-historico-btn">Limpar histórico de vencedores</button>
+            <button class="danger" id="clear-historico-btn">Limpar Histórico</button>
           </div>
         </div>
 
@@ -148,26 +148,7 @@
 
       <div class="card settings-panel" data-panel="jogos" hidden>
         <div class="backoffice-section">
-          <h2 style="margin-top:0">Wishlist</h2>
-          <p class="hint">Reinicia as reações (👍/👎) de todos os membros, ou esvazia por completo a lista de jogos pagos.</p>
-          <div class="actions-row">
-            <button id="clear-reactions-btn">Limpar reações (Likes/Dislikes)</button>
-            <button class="danger" id="empty-wishlist-btn">Esvaziar lista da Wishlist</button>
-          </div>
-        </div>
-
-        <div class="backoffice-section">
-          <h2>Esvaziar Listas de Jogos</h2>
-          <p class="hint">Remove todos os jogos das listas de Jogos Habituais, Jogos ainda não jogados e Links.</p>
-          <div class="actions-row">
-            <button class="danger" id="empty-habituais-btn">Esvaziar Jogos Habituais</button>
-            <button class="danger" id="empty-nao-jogados-btn">Esvaziar Jogos ainda não jogados</button>
-            <button class="danger" id="empty-links-btn">Esvaziar Links</button>
-          </div>
-        </div>
-
-        <div class="backoffice-section">
-          <h2>Colunas das Tabelas de Jogos</h2>
+          <h2 style="margin-top:0">Colunas das Tabelas de Jogos</h2>
           <p class="hint">Adiciona, remove, renomeia ou reordena as colunas das tabelas de Jogos Habituais, Jogos ainda não jogados, Wishlist e Passeios. A primeira coluna de cada tabela não pode ser removida.</p>
 
           <h3 class="theme-group-title">Jogos Habituais</h3>
@@ -210,6 +191,25 @@
             <button class="primary" id="add-col-links-btn">Adicionar</button>
           </div>
         </div>
+
+        <div class="backoffice-section">
+          <h2>Esvaziar Listas de Jogos</h2>
+          <p class="hint">Remove todos os jogos das listas de Jogos Habituais, Jogos ainda não jogados e Links.</p>
+          <div class="actions-row">
+            <button class="danger" id="empty-habituais-btn">Esvaziar Jogos Habituais</button>
+            <button class="danger" id="empty-nao-jogados-btn">Esvaziar Jogos ainda não jogados</button>
+            <button class="danger" id="empty-links-btn">Esvaziar Links</button>
+          </div>
+        </div>
+
+        <div class="backoffice-section">
+          <h2>Wishlist</h2>
+          <p class="hint">Reinicia as reações (👍/👎) de todos os membros, ou esvazia por completo a lista de jogos pagos.</p>
+          <div class="actions-row">
+            <button id="clear-reactions-btn">Limpar reações (Likes/Dislikes)</button>
+            <button class="danger" id="empty-wishlist-btn">Esvaziar lista da Wishlist</button>
+          </div>
+        </div>
       </div>
 
       <div class="card settings-panel" data-panel="nuvem" hidden>
@@ -243,6 +243,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
 <script src="assets/js/common.js?v=30"></script>
-<script src="assets/js/backoffice.js?v=21"></script>
+<script src="assets/js/backoffice.js?v=22"></script>
 </body>
 </html>

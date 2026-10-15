@@ -1195,3 +1195,5 @@ body.has-season-player { padding-bottom: 64px; }
 .login-card .remember-row input[type="checkbox"] { width: 16px; height: 16px; margin: 0; padding: 0; accent-color: var(--accent); cursor: pointer; }
 .remember-hint { margin: 0 0 6px; font-size: 0.75rem; color: var(--text-dim); }
 .remember-hint:empty { display: none; }
+
+#horario-jogo-input { width: 95px; }
