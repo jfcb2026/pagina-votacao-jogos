@@ -41,7 +41,7 @@ atualizarBotaoSyncToggle();
 document.getElementById("export-backup-btn").innerHTML = `Exportar Backup${SAVE_ICON}`;
 document.getElementById("import-backup-btn").innerHTML = `Importar Backup${IMPORT_ICON}`;
 document.getElementById("force-unlock-votacao-btn").innerHTML = `Forçar Desbloqueio da Votação${UNLOCK_ICON}`;
-document.getElementById("clear-votacao-atual-btn").innerHTML = `Limpar Votação Atual${TRASH_ICON}`;
+document.getElementById("clear-votacao-atual-btn").innerHTML = `Reiniciar Votação Atual${ROTATE_ICON}`;
 
 function atualizarEstadoLigacao() {
   const dot = document.getElementById("sync-status-dot");
@@ -346,24 +346,73 @@ document.getElementById("remove-slot-btn").addEventListener("click", () => {
 renderSlots();
 
 document.getElementById("force-unlock-votacao-btn").addEventListener("click", () => {
-  if (!confirm("Forçar o desbloqueio da votação atual? A tabela volta a ficar editável e o vencedor deixa de estar anunciado. Os votos dados até agora são mantidos.")) return;
+  votacao = loadStore("votacaoSemanal");
+  historicoVencedores = loadStore("historicoVencedores");
+  const msg = document.getElementById("force-unlock-msg");
+  if (!vencedorVotacaoAtual(votacao)) {
+    msg.textContent = "Só é possível forçar o desbloqueio quando a votação atual já tem um vencedor anunciado.";
+    return;
+  }
+  if (!confirm("Forçar o desbloqueio da votação atual? O vencedor anunciado é retirado do histórico e a tabela volta a ficar editável. Os votos dados até agora são mantidos, para poderem ser corrigidos.")) return;
+  const retirado = retirarVencedorAtualDoHistorico();
   votacao.validado = false;
   votacao.confirmado = false;
+  votacao.vencedorSorteado = null;
+  votacao.historicoId = null;
   saveStore("votacaoSemanal", votacao);
   renderSlots();
-  document.getElementById("force-unlock-msg").textContent = "Votação desbloqueada.";
+  msg.textContent = retirado
+    ? `Votação desbloqueada e "${retirado}" retirado do histórico. Os votos foram mantidos.`
+    : "Votação desbloqueada. Os votos foram mantidos.";
 });
 
+function vencedorVotacaoAtual(v) {
+  if (!v.confirmado) return null;
+  if (v.vencedorSorteado) return v.vencedorSorteado;
+  const counts = {};
+  Object.values(v.votos || {}).forEach(votos => votos.forEach(j => { if (j) counts[j] = (counts[j] || 0) + 1; }));
+  const ranking = Object.entries(counts).sort((x, y) => y[1] - x[1]);
+  if (!ranking.length) return null;
+  const empatados = ranking.filter(([, n]) => n === ranking[0][1]);
+  return empatados.length === 1 ? empatados[0][0] : null;
+}
+
+function retirarVencedorAtualDoHistorico() {
+  const vencedor = vencedorVotacaoAtual(votacao);
+  if (!vencedor) return null;
+  let idx = votacao.historicoId ? historicoVencedores.findIndex(h => h.id === votacao.historicoId) : -1;
+  if (idx < 0 && !votacao.historicoId) {
+    const ultimo = historicoVencedores.length - 1;
+    if (ultimo >= 0 && historicoVencedores[ultimo].vencedor === vencedor) idx = ultimo;
+  }
+  if (idx < 0) return null;
+  historicoVencedores.splice(idx, 1);
+  saveStore("historicoVencedores", historicoVencedores);
+  renderHistorico();
+  return vencedor;
+}
+
 document.getElementById("clear-votacao-atual-btn").addEventListener("click", () => {
-  if (!confirm("Limpar por completo a votação atual? Todos os votos dados são apagados (o histórico de vencedores anteriores não é afetado) e a tabela volta a ficar editável para uma nova ronda.")) return;
+  if (!confirm("Reiniciar a votação atual? Todos os votos desta ronda são apagados e, se o vencedor já tiver sido anunciado, é também retirado do histórico. Os vencedores de votações anteriores não são afetados.")) return;
+  votacao = loadStore("votacaoSemanal");
+  historicoVencedores = loadStore("historicoVencedores");
+
+  const retirado = retirarVencedorAtualDoHistorico();
+
   votacao.validado = false;
   votacao.confirmado = false;
+  votacao.vencedorSorteado = null;
+  votacao.historicoId = null;
+  votacao.desempate = null;
   Object.keys(votacao.votos).forEach(m => {
     votacao.votos[m] = votacao.votos[m].map(() => "");
   });
+  if (votacao.naoVouJogar) Object.keys(votacao.naoVouJogar).forEach(m => { votacao.naoVouJogar[m] = false; });
   saveStore("votacaoSemanal", votacao);
   renderSlots();
-  document.getElementById("clear-votacao-atual-msg").textContent = "Votação atual limpa.";
+  document.getElementById("clear-votacao-atual-msg").textContent = retirado
+    ? `Votação atual reiniciada e "${retirado}" retirado do histórico.`
+    : "Votação atual reiniciada.";
 });
 
 let historicoVencedores = loadStore("historicoVencedores");
@@ -413,6 +462,7 @@ document.getElementById("clear-historico-btn").addEventListener("click", () => {
   Object.keys(votacao.votos).forEach(m => {
     votacao.votos[m] = votacao.votos[m].map(() => "");
   });
+  votacao.desempate = null;
   saveStore("votacaoSemanal", votacao);
   renderSlots();
 

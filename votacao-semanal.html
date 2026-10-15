@@ -26,6 +26,10 @@
     </div>
   </div>
 
+  <div class="card card-sync" id="desempate-card" style="display:none">
+    <div id="desempate-box"></div>
+  </div>
+
   <div class="card card-sync">
     <h2 style="margin-top:0">Resultados</h2>
     <ul class="results-list" id="results-list"></ul>
@@ -34,7 +38,7 @@
       <button class="primary" id="desbloquear-votos-btn" style="display:none">Reabrir Votação</button>
       <button class="primary" id="sortear-vencedor-btn" style="display:none">Sortear Vencedor</button>
       <button class="primary" id="validar-btn" style="display:none">Validar Votos</button>
-      <button class="danger" id="reiniciar-votacao-btn" style="display:none">Reiniciar Votação</button>
+      <button class="success" id="reiniciar-votacao-btn" style="display:none">Nova Votação</button>
       <span class="login-error" id="validar-erro" style="min-height:auto;"></span>
     </div>
   </div>
@@ -52,7 +56,7 @@
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script><script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=27"></script>
-<script src="assets/js/votacao.js?v=10"></script>
+<script src="assets/js/common.js?v=29"></script>
+<script src="assets/js/votacao.js?v=13"></script>
 </body>
 </html>

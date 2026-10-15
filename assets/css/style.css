@@ -1185,3 +1185,13 @@ body.has-season-player { padding-bottom: 64px; }
 @media (max-width: 560px) {
   .season-player { border-radius: 18px; }
 }
+
+#desempate-box .winner-box { margin-top: 0; }
+.desempate-msg { font-size: 1rem; }
+.desempate-jogos { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 10px; }
+
+.login-card input.sr-only { width: 1px; height: 1px; padding: 0; margin: -1px; border: 0; }
+.remember-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin: -4px 0 6px; font-size: 0.85rem; color: var(--text-dim); cursor: pointer; user-select: none; }
+.login-card .remember-row input[type="checkbox"] { width: 16px; height: 16px; margin: 0; padding: 0; accent-color: var(--accent); cursor: pointer; }
+.remember-hint { margin: 0 0 6px; font-size: 0.75rem; color: var(--text-dim); }
+.remember-hint:empty { display: none; }

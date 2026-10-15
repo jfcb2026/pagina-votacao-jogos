@@ -13,8 +13,11 @@
   <div class="login-card">
     <h1 id="site-name-heading">🎮 Página De Jogos De Amigos</h1>
     <p class="subtitle">Introduz a password de acesso</p>
+    <input type="text" id="login-username" name="username" autocomplete="username" value="jogos-amigos" class="sr-only" tabindex="-1" aria-hidden="true">
     <label for="password-input" class="sr-only">Password de acesso</label>
-    <input type="password" id="password-input" placeholder="Password" autofocus>
+    <input type="password" id="password-input" name="password" autocomplete="current-password" placeholder="Password" autofocus>
+    <label class="remember-row" for="remember-password"><input type="checkbox" id="remember-password">Memorizar password neste browser</label>
+    <p class="remember-hint" id="remember-hint"></p>
     <div class="login-error" id="login-error"></div>
     <button class="primary" id="login-btn" style="width:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:6px">Entrar<svg class="login-btn-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg></button>
   </div>
@@ -48,8 +51,35 @@ try {
     loginBtn.innerHTML = ligado ? '<span class="spinner"></span>' : loginBtnLabel;
   }
 
-  function doLogin() {
+  const rememberBox = document.getElementById("remember-password");
+  const rememberHint = document.getElementById("remember-hint");
+
+  function lerPreferenciaMemorizar() {
+    try { return localStorage.getItem("jogosAmigos_local_lembrarPassword") === "1"; } catch (e) { return false; }
+  }
+
+  rememberBox.checked = lerPreferenciaMemorizar();
+  rememberBox.addEventListener("change", () => {
+    try { localStorage.setItem("jogosAmigos_local_lembrarPassword", rememberBox.checked ? "1" : "0"); } catch (e) { }
+    rememberHint.textContent = rememberBox.checked
+      ? ""
+      : "Se o browser já tiver a password guardada, podes removê-la nas definições de passwords do browser.";
+    if (!rememberBox.checked && navigator.credentials && navigator.credentials.preventSilentAccess) {
+      navigator.credentials.preventSilentAccess().catch(() => { });
+    }
+  });
+
+  async function guardarPasswordNoBrowser() {
+    if (!rememberBox.checked || !window.PasswordCredential || !navigator.credentials) return;
+    try {
+      const cred = new PasswordCredential({ id: "jogos-amigos", password: input.value, name: "Página De Jogos De Amigos" });
+      await Promise.race([navigator.credentials.store(cred), new Promise(r => setTimeout(r, 3000))]);
+    } catch (e) { }
+  }
+
+  async function doLogin() {
     try { sessionStorage.setItem("jogosAmigos_auth", "ok"); } catch (e) { /* ignora */ }
+    await guardarPasswordNoBrowser();
     window.location.href = redirectDestination();
   }
 
@@ -113,17 +143,17 @@ try {
 
       if (!resultado.ok) {
         const esperado = await sha256Hex(defaultPassword);
-        if (digest === esperado) { doLogin(); return; }
+        if (digest === esperado) { await doLogin(); return; }
         error.textContent = "Sem ligação para verificar a password. Tenta novamente.";
         return;
       }
 
       const esperado = stored !== null ? stored : await sha256Hex(defaultPassword);
-      if (digest === esperado) { doLogin(); return; }
+      if (digest === esperado) { await doLogin(); return; }
 
       const pareceHash = v => /^[0-9a-f]{64}$/i.test(v);
       if (stored !== null && !pareceHash(stored) && input.value === stored) {
-        doLogin();
+        await doLogin();
         return;
       }
 
@@ -149,7 +179,7 @@ try {
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
 <script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/common.js?v=27"></script>
+<script src="assets/js/common.js?v=29"></script>
 <script>
 try {
   document.getElementById("site-name-heading").textContent = "🎮 " + loadStore("nomeSite");

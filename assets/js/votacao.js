@@ -10,6 +10,7 @@ function normalizarVotacao() {
   if (typeof votacao.confirmado !== "boolean") votacao.confirmado = false;
   if (typeof votacao.vencedorSorteado === "undefined") votacao.vencedorSorteado = null;
   if (!votacao.naoVouJogar) votacao.naoVouJogar = {};
+  if (typeof votacao.desempate === "undefined") votacao.desempate = null;
 }
 
 normalizarVotacao();
@@ -40,7 +41,7 @@ function persistMerged(fn) {
 document.getElementById("fechar-votacao-btn").innerHTML = `Fechar Votação${LOCK_ICON}`;
 document.getElementById("desbloquear-votos-btn").innerHTML = `Reabrir Votação${UNLOCK_ICON}`;
 document.getElementById("validar-btn").innerHTML = `Validar Votos${CHECK_ICON}`;
-document.getElementById("reiniciar-votacao-btn").innerHTML = `Reiniciar Votação${REFRESH_ICON}`;
+document.getElementById("reiniciar-votacao-btn").innerHTML = `Nova Votação${REFRESH_ICON}`;
 document.getElementById("sortear-vencedor-btn").innerHTML = `Sortear Vencedor${DICE_ICON}`;
 
 function ensureVotosStructure() {
@@ -58,6 +59,10 @@ function ensureVotosStructure() {
   });
 }
 
+function novoIdHistorico() {
+  return "h" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
 function persist() {
   saveStore("votacaoSemanal", votacao);
 }
@@ -70,8 +75,39 @@ function temVotoAlgum(m) {
   return votacao.votos[m].some(v => v);
 }
 
+function emDesempate() {
+  return !!(votacao.desempate && Array.isArray(votacao.desempate.jogos) && votacao.desempate.jogos.length);
+}
+
+function numColunasVoto() {
+  return emDesempate() ? 1 : votacao.slots;
+}
+
+function participaDesempate(m) {
+  return emDesempate() && (votacao.desempate.membros || []).includes(m);
+}
+
+function empateConfirmado() {
+  if (!votacao.confirmado || votacao.vencedorSorteado) return null;
+  const ranking = currentRanking();
+  if (!ranking.length) return null;
+  const top = ranking[0][1];
+  const empatados = ranking.filter(([, n]) => n === top).map(([jogo]) => jogo);
+  return empatados.length > 1 ? empatados : null;
+}
+
 function gameOptionsHtml(selected) {
   let html = `<option value="">—</option>`;
+
+  if (emDesempate()) {
+    html += `<optgroup label="Jogos empatados">`;
+    votacao.desempate.jogos.forEach(jogo => {
+      const sel = jogo === selected ? "selected" : "";
+      html += `<option value="${escapeHtml(jogo)}" ${sel}>${escapeHtml(jogo)}</option>`;
+    });
+    html += `</optgroup>`;
+    return html;
+  }
 
   if (jogosHabituais.length) {
     html += `<optgroup label="Jogos Habituais">`;
@@ -99,7 +135,7 @@ let votoFeedbackTimer = null;
 function showVotoFeedback(idx) {
   const el = document.getElementById("voto-feedback");
   if (!el) return;
-  el.textContent = `Jogo ${idx + 1} votado com sucesso!`;
+  el.textContent = emDesempate() ? "Voto de desempate registado com sucesso!" : `Jogo ${idx + 1} votado com sucesso!`;
   if (votoFeedbackTimer) clearTimeout(votoFeedbackTimer);
   votoFeedbackTimer = setTimeout(() => { el.textContent = ""; }, 2500);
 }
@@ -112,22 +148,24 @@ function clearVotoFeedback() {
 }
 
 function renderRow(m) {
-  const votos = votacao.votos[m];
+  const cols = numColunasVoto();
+  const votos = votacao.votos[m].slice(0, cols);
   const votouAlgo = temVotoAlgum(m);
+  const desempate = emDesempate();
+  const foraDesempate = desempate && !participaDesempate(m);
   const naoVai = !!votacao.naoVouJogar[m] && !votouAlgo;
-
-  const semVoto = votacao.validado && !votouAlgo && !votacao.naoVouJogar[m];
+  const semVoto = !naoVai && ((votacao.validado && !votouAlgo) || foraDesempate);
 
   const gamesCellsHtml = naoVai
-    ? `<td colspan="${votacao.slots}" class="text-center"><span class="hint">Não vai jogar esta semana</span></td>`
+    ? `<td colspan="${cols}" class="text-center"><span class="hint">Não vai jogar esta semana</span></td>`
     : semVoto
-      ? `<td colspan="${votacao.slots}" class="text-center"><span class="hint">Não votou</span></td>`
+      ? `<td colspan="${cols}" class="text-center"><span class="hint">Não votou</span></td>`
       : votos.map((v, i) => `
         <td><select data-membro="${escapeHtml(m)}" data-idx="${i}" ${votacao.validado ? "disabled" : ""}>${gameOptionsHtml(v)}</select></td>
       `).join("");
 
   let actionCellHtml = "<td></td>";
-  if (!votacao.validado && !votouAlgo) {
+  if (!desempate && !votacao.validado && !votouAlgo) {
     actionCellHtml = naoVai
       ? `<td class="text-center"><button type="button" class="small success toggle-jogar-btn" data-membro="${escapeHtml(m)}">Vou jogar${CHECK_ICON}</button></td>`
       : `<td class="text-center"><button type="button" class="small danger toggle-jogar-btn" data-membro="${escapeHtml(m)}">Não vou jogar${X_ICON}</button></td>`;
@@ -142,12 +180,28 @@ function renderRow(m) {
   `;
 }
 
+function renderDesempateCard() {
+  const card = document.getElementById("desempate-card");
+  if (!card) return;
+  if (!emDesempate() || votacao.confirmado) {
+    card.style.display = "none";
+    return;
+  }
+  document.getElementById("desempate-box").innerHTML = `
+    <div class="winner-box tie desempate-box">
+      <div class="desempate-msg">⚖️ Houve empate entre estes jogos. Quem votou escolhe agora apenas um deles para desempatar.</div>
+      <div class="desempate-jogos">${votacao.desempate.jogos.map(j => `<span class="pill">${escapeHtml(j)}</span>`).join("")}</div>
+    </div>
+  `;
+  card.style.display = "";
+}
+
 function render() {
   ensureVotosStructure();
 
   const head = document.getElementById("votacao-head");
   head.innerHTML = `<th>Membro</th>` +
-    Array.from({ length: votacao.slots }).map((_, i) => `<th>Jogo ${i + 1}</th>`).join("") +
+    Array.from({ length: numColunasVoto() }).map((_, i) => `<th>${emDesempate() ? "Jogo (desempate)" : `Jogo ${i + 1}`}</th>`).join("") +
     `<th></th>`;
 
   const body = document.getElementById("votacao-body");
@@ -190,8 +244,12 @@ function render() {
   document.getElementById("reiniciar-votacao-btn").style.display = "none";
   document.getElementById("sortear-vencedor-btn").style.display = "none";
   document.getElementById("validar-erro").textContent = "";
+  document.getElementById("desbloquear-votos-btn").innerHTML = empateConfirmado()
+    ? `Reabrir Votação - Empatados${UNLOCK_ICON}`
+    : `Reabrir Votação${UNLOCK_ICON}`;
 
   renderResults();
+  renderDesempateCard();
 }
 
 function currentRanking() {
@@ -239,7 +297,7 @@ function renderResults() {
     reiniciarBtn.style.display = "";
     sortearBtn.style.display = "none";
   } else if (topGames.length > 1) {
-    winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação" para desempatar, ou "Sortear Vencedor" para decidir ao acaso.</div>`;
+    winnerBox.innerHTML = `<div class="winner-box tie">Há empate! Usa "Reabrir Votação - Empatados" para desempatar, ou "Sortear Vencedor" para decidir ao acaso.</div>`;
     reabrirBtn.style.display = "";
     reiniciarBtn.style.display = "none";
     sortearBtn.style.display = "";
@@ -275,6 +333,16 @@ document.getElementById("fechar-votacao-btn").addEventListener("click", () => {
 });
 
 document.getElementById("desbloquear-votos-btn").addEventListener("click", () => {
+  const empatados = empateConfirmado();
+  if (empatados) {
+    const participantes = membros.filter(m => temVotoAlgum(m));
+    if (!confirm(`Reabrir a votação só entre os jogos empatados (${empatados.join(", ")})? Os votos atuais são apagados e quem votou escolhe agora apenas um destes jogos.`)) return;
+    votacao.desempate = { jogos: empatados, membros: participantes };
+    Object.keys(votacao.votos).forEach(m => {
+      votacao.votos[m] = votacao.votos[m].map(() => "");
+    });
+    participantes.forEach(m => { votacao.naoVouJogar[m] = false; });
+  }
   votacao.validado = false;
   votacao.confirmado = false;
   votacao.vencedorSorteado = null;
@@ -298,6 +366,7 @@ document.getElementById("validar-btn").addEventListener("click", () => {
   if (topGames.length === 1) {
     const historico = loadStore("historicoVencedores");
     historico.push({
+      id: novoIdHistorico(),
       data: new Date().toISOString(),
       dataJogoLabel: nextGameDateLabel(loadStore("diaSemanaJogo")),
       empate: false,
@@ -305,6 +374,8 @@ document.getElementById("validar-btn").addEventListener("click", () => {
       ranking: ranking.map(([jogo, votos]) => ({ jogo, votos })),
     });
     saveStore("historicoVencedores", historico);
+    votacao.historicoId = historico[historico.length - 1].id;
+    persist();
   }
 
   render();
@@ -328,6 +399,7 @@ document.getElementById("sortear-vencedor-btn").addEventListener("click", () => 
 
   const historico = loadStore("historicoVencedores");
   historico.push({
+    id: novoIdHistorico(),
     data: new Date().toISOString(),
     dataJogoLabel: nextGameDateLabel(loadStore("diaSemanaJogo")),
     empate: false,
@@ -336,13 +408,15 @@ document.getElementById("sortear-vencedor-btn").addEventListener("click", () => 
     ranking: ranking.map(([jogo, votos]) => ({ jogo, votos })),
   });
   saveStore("historicoVencedores", historico);
+  votacao.historicoId = historico[historico.length - 1].id;
+  persist();
 
   render();
   renderHistory();
 });
 
 document.getElementById("reiniciar-votacao-btn").addEventListener("click", () => {
-  if (!confirm("Reiniciar a votação? Os votos atuais são apagados e a tabela volta a ficar editável para uma nova ronda.")) return;
+  if (!confirm("Começar uma nova votação? O vencedor desta ronda fica guardado no histórico, os votos atuais são apagados e a tabela volta a ficar disponível para votar.")) return;
   votacao.validado = false;
   votacao.confirmado = false;
   votacao.vencedorSorteado = null;
@@ -352,6 +426,8 @@ document.getElementById("reiniciar-votacao-btn").addEventListener("click", () =>
   Object.keys(votacao.naoVouJogar).forEach(m => {
     votacao.naoVouJogar[m] = false;
   });
+  votacao.desempate = null;
+  votacao.historicoId = null;
   persist();
   render();
 });
